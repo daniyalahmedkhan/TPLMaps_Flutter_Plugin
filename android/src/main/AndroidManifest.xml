@@ -1,0 +1,39 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.tpl.tplmapsflutter.tplmapsflutterplugin">
+
+
+    <!-- TO GIVE MAPS  INTERNET ACCESS TO LOAD -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- TO USE LOCATION  FUNCTIONS OF SDK -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- TO GIVE MAPS  NETWORK (WIFI) ACCESS -->
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+    <application
+        android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true">
+
+        <meta-data android:name="com.tplmaps.android.sdk.API_KEY"
+            android:value="$2a$10$S0hDhKNNZgcC9JR6nPXDBDrUAqj8f5gDLP2a0lLGqCTfNKq5GpvY6" />
+
+        <!--TPL MAPS CONFIGURATIONS-->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+
+
+
+    </application>
+
+</manifest>
