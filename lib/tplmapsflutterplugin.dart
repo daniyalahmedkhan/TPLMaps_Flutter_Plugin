@@ -17,6 +17,7 @@ class Tplmapsflutterplugin {
     return version;
   }
 
+
  // static Future<PlatformViewLink> get maps async {
  //   const String viewType = 'map';
  //   const Map<String, dynamic> creationParams = <String, dynamic>{};

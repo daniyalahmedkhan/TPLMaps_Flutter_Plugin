@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -7,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:tplmapsflutterplugin/TplMapsView.dart';
+import 'package:tplmapsflutterplugin/tplmapsflutterplugin.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,6 +30,19 @@ class _MyAppState extends State<MyApp> {
     return TplMapsView(
       tplMapsViewCreatedCallback: _callback,
     );
+    // switch (defaultTargetPlatform) {
+    //   case TargetPlatform.android:
+    //   // return widget on Android.
+    //
+    //   case TargetPlatform.iOS:
+    //   // return widget on iOS.
+    //   default:
+    //     throw UnsupportedError('Unsupported platform view');
+    // }
+
+    // return TplMapsView(
+    //   tplMapsViewCreatedCallback: _callback,
+    // );
     // return PlatformViewLink(
     //   viewType: viewType,
     //   surfaceFactory:
@@ -56,6 +72,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _callback(TplMapsViewController controller) {
-    controller.ping();
+    controller.setZoomEnabled(true);
+    controller.setCameraPositionAnimated(33.698047971892045, 73.06930062598059, 14.0);
+    controller.addMarker(33.705349, 73.069788);
+    controller.addMarker(33.698047971892045, 73.06930062598059);
   }
 }

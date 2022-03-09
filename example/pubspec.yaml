@@ -4,7 +4,7 @@ description: Demonstrates how to use the tplmapsflutterplugin plugin.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
+version: 1.0.0+1
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
@@ -13,6 +13,7 @@ dependencies:
     sdk: flutter
 
   tplmapsflutterplugin:
+
     # When depending on this package from a real application you should use:
     #   tplmapsflutterplugin: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints

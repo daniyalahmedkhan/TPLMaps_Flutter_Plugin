@@ -23,17 +23,18 @@ class TplmapsflutterpluginPlugin : FlutterPlugin, MethodCallHandler, FlutterActi
 //        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "tplmapsflutterplugin")
 //        channel.setMethodCallHandler(this)
 
+
         flutterPluginBinding
             .getPlatformViewRegistry()
-            .registerViewFactory("map", TPLMapViewFactory())
+            .registerViewFactory("map", TPLMapViewFactory(flutterPluginBinding.binaryMessenger))
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-//        if (call.method == "getPlatformVersion") {
-//            result.success("Android ${android.os.Build.VERSION.RELEASE}")
-//        } else {
-//            result.notImplemented()
-//        }
+        if (call.method == "getPlatformVersion") {
+            result.success("Android ${android.os.Build.VERSION.RELEASE}")
+        } else {
+            result.notImplemented()
+        }
     }
 //
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
