@@ -27,7 +27,18 @@ class _MyAppState extends State<MyApp> {
     // Pass parameters to the platform side.
     const Map<String, dynamic> creationParams = <String, dynamic>{};
 
+
     return TplMapsView(
+      isShowBuildings: true,
+      isZoomEnabled: true,
+      showZoomControls: true,
+      isTrafficEnabled: true,
+      mapMode: MapMode.DEFAULT,
+      enablePOIs: true,
+      setMyLocationEnabled: false,
+      myLocationButtonEnabled: false,
+      showsCompass: true,
+      allGesturesEnabled: true,
       tplMapsViewCreatedCallback: _callback,
     );
     // switch (defaultTargetPlatform) {
@@ -72,9 +83,28 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _callback(TplMapsViewController controller) {
-    controller.setZoomEnabled(true);
-    controller.setCameraPositionAnimated(33.698047971892045, 73.06930062598059, 14.0);
-    controller.addMarker(33.705349, 73.069788);
-    controller.addMarker(33.698047971892045, 73.06930062598059);
+    //controller.setZoomEnabled(true);
+    //controller.showBuildings(false);
+     controller.showBuildings(false);
+    // controller.setZoomEnabled(false);
+     controller.showZoomControls(false);
+     controller.setTrafficEnabled(false);
+     controller.enablePOIs(true);
+     controller.setMyLocationEnabled(true);
+     controller.myLocationButtonEnabled(true);
+     controller.showsCompass(false);
+
+     controller.setCameraPositionAnimated(33.698047971892045, 73.06930062598059, 14.0);
+     controller.addMarker(33.705349, 73.069788);
+     controller.addMarker(33.698047971892045, 73.06930062598059);
+    // controller.allGesturesEnabled(false);
+     controller.setMapMode(MapMode.DEFAULT);
+    bool isBuildingsEnabled = controller.isBuildingEnabled;
+    print("isBuildingsEnabled: $isBuildingsEnabled");
+    bool isTrafficEnabled = controller.isTrafficEnabled;
+    print("isTrafficEnabled: $isTrafficEnabled");
+    bool isPOIsEnabled = controller.isPOIsEnabled;
+    print("isPOIsEnabled: $isPOIsEnabled");
+    //mapMode: MapMode.DEFAULT,
   }
 }

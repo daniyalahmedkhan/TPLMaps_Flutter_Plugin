@@ -15,6 +15,10 @@ class TPLMapViewFactory: NSObject, FlutterPlatformViewFactory {
             super.init()
         }
     
+    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+          return FlutterStandardMessageCodec.sharedInstance()
+    }
+    
     func create(
             withFrame frame: CGRect,
             viewIdentifier viewId: Int64,
@@ -26,4 +30,5 @@ class TPLMapViewFactory: NSObject, FlutterPlatformViewFactory {
                 arguments: args,
                 binaryMessenger: messenger)
         }
+    
 }

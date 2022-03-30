@@ -12,6 +12,7 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
     
     
     var map : TPLMaps.TPLMapView
+    var myLocationButtonEnabled: Bool = false
    // private var map: TPLMaps.TPLMapView
     init(
                 frame: CGRect,
@@ -20,10 +21,40 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
                 binaryMessenger messenger: FlutterBinaryMessenger?
             ) {
                 self.map = TPLMaps.TPLMapView.init()
-                self.map.zoomEnabled = true
+                //self.map.zoomEnabled = true
                 
                 super.init()
                 self.map.delegate = self
+                if let args = args as? [String : Any?] {
+                    let isZoomEnabled : Bool = args["isZoomEnabled"] as! Bool
+                    let isShowBuildings : Bool = args["isShowBuildings"] as! Bool
+                    let showZoomControls : Bool = args["showZoomControls"] as! Bool
+                    let isTrafficEnabled : Bool = args["isTrafficEnabled"] as! Bool
+                    let enablePOIs : Bool = args["enablePOIs"] as! Bool
+                    let mapMode: Int = args["mapMode"] as! Int
+                    let showsCompass: Bool = args["showsCompass"] as! Bool
+                    myLocationButtonEnabled = args["myLocationButtonEnabled"] as! Bool
+                    let setMyLocationEnabled: Bool = args["setMyLocationEnabled"] as! Bool
+                    let allGesturesEnabled: Bool = args["allGesturesEnabled"] as! Bool
+                    print("myLocationButtonEnabled: \(myLocationButtonEnabled)")
+                    print("setMyLocationEnabled: \(setMyLocationEnabled)")
+                    self.map.zoomEnabled = isZoomEnabled
+                    self.map.showsBuildings = isShowBuildings
+                    self.map.zoomControlsEnabled = showZoomControls
+                    self.map.showsCompass = showsCompass
+                    self.map.allGesturesEnabled = allGesturesEnabled
+                    self.map.trafficEnabled = isTrafficEnabled
+                    self.map.showsPointsOfInterest = enablePOIs
+                    
+                    self.map.showsUserLocation = setMyLocationEnabled;
+                    self.map.myLocationButtonEnabled = myLocationButtonEnabled
+                    if(mapMode == 1){
+                        self.map.mapMode = MapViewTheme.DAY
+                    }
+                    else{
+                        self.map.mapMode = MapViewTheme.NIGHT
+                    }
+                }
                 
                 let mapChannel = FlutterMethodChannel(name: "plugins/map",
                     binaryMessenger: messenger!)
@@ -50,6 +81,49 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
                         let isEnable = args["isEnable"] as! Bool
                         self.setZoomEnabled(self.map, isEnable: isEnable)
                         break;
+                    case "showBuildings":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.showBuildings(self.map, isEnable: isEnable)
+                    case "enablePOIs":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.enablePOIs(self.map, isEnable: isEnable)
+                    case "showZoomControls":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.showZoomControls(self.map, isEnable: isEnable)
+                    case "setTrafficEnabled":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.setTrafficEnabled(self.map, isEnable: isEnable)
+                    case "showsCompass":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.showsCompass(self.map, isEnable: isEnable)
+                    case "allGesturesEnabled":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.setAllGesturesEnabled(self.map, isEnable: isEnable)
+                    case "myLocationButtonEnabled":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.setMyLocationButtonEnabled(self.map, isEnable: isEnable)
+                    case "setMyLocationEnabled":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let isEnable = args["isEnable"] as! Bool
+                        self.setMyLocationEnabled(self.map, isEnable: isEnable)
+                    case "setMapMode":
+                        guard let args = call.arguments as? [String : Any] else {return}
+                        let mapMode: Int = args["mapMode"] as! Int
+                        var mapViewTheme: MapViewTheme = MapViewTheme.DAY
+                        if(mapMode == 1){
+                            mapViewTheme = MapViewTheme.DAY
+                        }
+                        else if(mapMode == 2){
+                            mapViewTheme = MapViewTheme.NIGHT
+                        }
+                        self.setMapMode(self.map, theme: mapViewTheme)
                     default:
                         result(FlutterMethodNotImplemented)
                         return
@@ -60,21 +134,40 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
                 // iOS views can be created here
                 //createNativeView(view: _view)
             }
-        
-//        func createNativeView(view _view: UIView){
-//                _view.backgroundColor = UIColor.blue
-//                let nativeLabel = UILabel()
-//                nativeLabel.text = "Native text from iOS"
-//                nativeLabel.textColor = UIColor.white
-//                nativeLabel.textAlignment = .center
-//                nativeLabel.frame = CGRect(x: 0, y: 0, width: 180, height: 48.0)
-//                _view.addSubview(nativeLabel)
-//            }
         func view() -> UIView {
             return map
         }
     func setZoomEnabled(_ mapView: TPLMapView, isEnable: Bool){
         mapView.zoomEnabled = isEnable
+    }
+    func showBuildings(_ mapView: TPLMapView, isEnable: Bool){
+        mapView.showsBuildings = isEnable
+    }
+    func enablePOIs(_ mapView: TPLMapView, isEnable: Bool){
+        mapView.showsPointsOfInterest = isEnable
+    }
+    func showZoomControls(_ mapView: TPLMapView, isEnable: Bool){
+        mapView.zoomControlsEnabled = isEnable
+    }
+    func setTrafficEnabled(_ mapView: TPLMapView, isEnable: Bool){
+        mapView.trafficEnabled = isEnable
+    }
+    func showsCompass(_ mapView: TPLMapView, isEnable: Bool){
+        mapView.showsCompass = isEnable
+    }
+    func setAllGesturesEnabled(_ mapView: TPLMapView, isEnable: Bool){
+        mapView.allGesturesEnabled = isEnable
+    }
+    func setMyLocationButtonEnabled(_ mapView: TPLMapView, isEnable: Bool){
+        myLocationButtonEnabled = isEnable
+        mapView.myLocationButtonEnabled = isEnable
+    }
+    func setMyLocationEnabled(_ mapView: TPLMapView, isEnable: Bool){
+        print("setMyLocationEnabled: \(isEnable)")
+        mapView.showsUserLocation = isEnable
+    }
+    func setMapMode(_ mapView: TPLMapView, theme: MapViewTheme){
+        mapView.mapMode = theme
     }
     func addMarker(_ mapView: TPLMapView, latitude: Double, longitude: Double){
         let coord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)

@@ -2,6 +2,8 @@
   package="com.tpl.tplmapsflutter.tplmapsflutterplugin">
 
 
+
+
     <!-- TO GIVE MAPS  INTERNET ACCESS TO LOAD -->
     <uses-permission android:name="android.permission.INTERNET" />
 

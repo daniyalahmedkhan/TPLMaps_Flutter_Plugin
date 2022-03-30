@@ -12,6 +12,7 @@ class TPLMapViewFactory internal constructor(messenger: BinaryMessenger) : Platf
     private var bMessenger: BinaryMessenger = messenger
 
     override fun create(context: Context?, viewId: Int, args: Any?): PlatformView {
-        return TPLMapView(context, viewId, bMessenger)
+        val params: Object? = args as? Object
+        return TPLMapView(context, viewId, bMessenger, args)
     }
 }
