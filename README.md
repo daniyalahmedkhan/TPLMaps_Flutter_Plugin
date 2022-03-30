@@ -1,17 +1,14 @@
 # tplmapsflutterplugin
 
-# TPL Maps Flutter Plugin
+# TPL Maps Flutter Plugin - Alpha Version
 
-A new Flutter project.
+TPL Maps Flutter Plugin support added.
 
-## Getting Started
+## V - 0.0.1
+Initial base map loaded
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+## V - 0.0.2
+Added some map functionality
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+## V - 0.0.3
+Added marker and zooming functionality
