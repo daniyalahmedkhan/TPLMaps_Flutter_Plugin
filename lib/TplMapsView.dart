@@ -9,6 +9,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 
 typedef TplMapsViewCreatedCallback = void Function(TplMapsViewController controller);
+typedef TPlMapsViewMarkerCallBack = void Function(String str);
 
 class MapMode {
   static const DEFAULT = 1;
@@ -17,6 +18,7 @@ class MapMode {
 
 class TplMapsView extends StatefulWidget {
   final TplMapsViewCreatedCallback? tplMapsViewCreatedCallback;
+  final TPlMapsViewMarkerCallBack? tPlMapsViewMarkerCallBack;
   final isZoomEnabled;
   final isShowBuildings;
   final showZoomControls;
@@ -30,6 +32,7 @@ class TplMapsView extends StatefulWidget {
   const TplMapsView({
     Key? key,
     this.tplMapsViewCreatedCallback,
+    this.tPlMapsViewMarkerCallBack,
     this.isShowBuildings = false,
     this.isZoomEnabled = true,
     this.showZoomControls = false,
@@ -41,8 +44,6 @@ class TplMapsView extends StatefulWidget {
     this.setMyLocationEnabled = false,
     this.mapMode
   }) : super(key: key);
-
-
 
   @override
   State<StatefulWidget> createState() => _TplMapsViewState();
@@ -70,7 +71,15 @@ class _TplMapsViewState extends State<TplMapsView>{
         widget.tplMapsViewCreatedCallback!(controller);
         break;
       case "onPoiClickListener":
-        print("On Poi Click Listener");
+        //print("On Poi Click Listener" + call.arguments.toString());
+        widget.tPlMapsViewMarkerCallBack!(call.arguments.toString());
+        break;
+      case "onLongClickListener":
+        widget.tPlMapsViewMarkerCallBack!(call.arguments.toString());
+        break;
+      case "onMarkerClick":
+        widget.tPlMapsViewMarkerCallBack!(call.arguments.toString());
+        break;
     }
   }
   @override
@@ -156,13 +165,13 @@ class _TplMapsViewState extends State<TplMapsView>{
 }
 
 class TplMapsViewController {
-  TplMapsViewController._(int id)
-      : _channel = MethodChannel('plugins/map');
+  TplMapsViewController._(int id) : _channel = MethodChannel('plugins/map');
   final MethodChannel _channel;
   bool isBuildingEnabled = false;
   bool isTrafficEnabled = false;
   bool isPOIsEnabled = false;
-  Future<void> setCameraPositionAnimated(double latitude,double longitude, double zoom) async {
+
+    Future<void> setCameraPositionAnimated(double latitude,double longitude, double zoom) async {
     print("camera animated called");
     return _channel.invokeMethod('setCameraPositionAnimated', {'latitude': latitude,'longitude':longitude, 'zoom':zoom});
   }
@@ -220,4 +229,47 @@ class TplMapsViewController {
     return _channel.invokeMethod('setMapMode', {'mapMode': value});
   }
 
+  Future<void> removeAllMarker(int value) async {
+    return _channel.invokeMethod('removeAllMarkers');
+  }
+
+  //startLat: Double , startLng: Double , endLat: Double , endLng: Double
+  Future<void> addPolyLine(double startLat , double startLng , double endLat , double endLng) async {
+    return _channel.invokeMethod('addPolyline');
+  }
+
+  Future<void> addCircle(double lat , double lng , double radius) async {
+    return _channel.invokeMethod('addCircle');
+  }
+
+  Future<void> removePolyline() async {
+    return _channel.invokeMethod('removePolyline');
+  }
+
+  Future<void> removeAllCircles() async {
+    return _channel.invokeMethod('removeAllCircles');
+  }
+
 }
+
+// Marker Clicks handler
+// typedef TplMarkerClickHandlerCallback  = Function(String str);
+//
+// class TplMarkerClickHandler{
+//
+//   final TplMarkerClickHandlerCallback tplMarkerClickHandler;
+//
+//   Future<void> nativeMethodHandler(MethodCall call) async{
+//    // print("handler called");
+//     switch(call.method){
+//       case "onPoiClickListener":
+//         print("On Poi Click Listener" + call.arguments.toString());
+//         String args = call.arguments;
+//         tplMarkerClickHandler.call(args);
+//         break;
+//     }
+//   }
+//
+//   TplMarkerClickHandler(this.tplMarkerClickHandler);
+// }
+

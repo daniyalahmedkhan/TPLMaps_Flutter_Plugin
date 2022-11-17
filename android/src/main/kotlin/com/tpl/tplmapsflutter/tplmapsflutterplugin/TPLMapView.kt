@@ -4,20 +4,20 @@ package com.tpl.tplmapsflutter
 //2、MethodChannel：use this to method invocation
 //
 //3、EventChannel: use this to event streams
+
 import android.content.Context
-import android.util.Log
+import android.graphics.Color
+import android.graphics.PointF
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.tpl.tplmapsflutter.tplmapsflutterplugin.R
+import com.tplmaps3d.*
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-import com.tpl.tplmapsflutter.tplmapsflutterplugin.R
-import com.tplmaps3d.*
-import io.flutter.plugin.common.EventChannel
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import java.util.concurrent.Future
 
 
 class TPLMapView internal constructor(context: Context?, id: Int, messenger: BinaryMessenger, params: Any?) : PlatformView,
@@ -142,6 +142,31 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
                 }
                 setMapMode(map, mapMode)
             }
+            "removeAllMarkers" -> {
+                mMapController.removeAllMarkers()
+            }
+            "addCircle" -> {
+                var long : Double = call.argument<Double>("longitude") ?: 0.0
+                var lat: Double = call.argument<Double>("latitude") ?: 0.0
+                var radius: Double = call.argument<Double>("radius") ?: 0.0
+
+                addCircle(lat , long , radius)
+            }
+            "addPolyline" -> {
+                var long : Double = call.argument<Double>("startLongitude") ?: 0.0
+                var lat: Double = call.argument<Double>("startLatitude") ?: 0.0
+                var endLat: Double = call.argument<Double>("endLatitude") ?: 0.0
+                var endLong: Double = call.argument<Double>("endLongitude") ?: 0.0
+                //var radius: Double = call.argument<Double>("radius") ?: 0.0
+
+                addPolyline(lat , long , endLat , endLong )
+            }
+            "removePolyline" -> {
+                removePolyline()
+            }
+            "removeAllCircles" -> {
+                removeAllCircles()
+            }
             else -> result.notImplemented()
         }
     }
@@ -202,9 +227,41 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
         channel.invokeMethod("onMapReady", true)
     }
 
+    private fun addCircle(lat: Double , lng: Double , radius: Double) : Circle{
+        val circle: Circle = mMapController.addCircle(
+            CircleOptions()
+                .center(LngLat(lng, lat))
+                .radius(radius)
+                .fillColor(Color.CYAN)
+        )
+        return circle
+    }
 
-    override fun onMapReady
-                (mapController: MapController?) {
+    private fun addPolyline(startLat: Double , startLng: Double , endLat: Double , endLng: Double){
+        val polyline: Polyline = mMapController.addPolyline(
+            PolylineOptions()
+                .add(LngLat(startLng, startLat), LngLat(endLng, endLat))
+                .color(Color.WHITE)
+                .width(5)
+                .outlineWidth(2)
+                .outlineColor(Color.BLUE)
+        )
+    }
+
+    private fun removePolyline(){
+        mMapController.removeAllPolyLines()
+    }
+
+    private fun removeCircle(circle: Circle){
+        mMapController.removeCircle(circle)
+    }
+
+    private fun removeAllCircles(){
+        mMapController.removeAllCircles()
+    }
+
+
+    override fun onMapReady(mapController: MapController?) {
         mMapController = mapController!!
         mUiSettings = mapController.uiSettings
         var isZoomEnabled: Boolean = args?.get("isZoomEnabled") as Boolean
@@ -220,8 +277,37 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
         mUiSettings.showMyLocationButton(myLocationButtonEnabled)
 
         mMapController.setOnPoiClickListener {
-            channel.invokeMethod("onPoiClickListener", map.isBuildingEnabled)
+
+            val poiMap = HashMap<String, String>()
+            poiMap["LatLng"] = "${it.lngLat.latitude}"+",${it.lngLat.longitude}"
+            poiMap["name"] = it.name
+            poiMap["id"] = it.id
+
+            channel.invokeMethod("onPoiClickListener", poiMap)
         }
+
+        mMapController.setOnMapLongClickListener { x, y ->
+            val tapPoint = mMapController.screenPositionToLngLat(PointF(x,y))
+
+            val poiMap = HashMap<String, String>()
+            poiMap["LatLng"] = "${tapPoint.latitude}"+",${tapPoint.longitude}"
+
+            channel.invokeMethod("onLongClickListener", poiMap)
+            addMarker(map, tapPoint.latitude, tapPoint.longitude)
+        }
+
+        mMapController.setOnMarkerClickListener {
+            val poiMap = HashMap<String, String>()
+            poiMap["LatLng"] = "${it.position.latitude}"+",${it.position.longitude}"
+            poiMap["name"] = it.title
+            poiMap["id"] = it.id.toString()
+            poiMap["desc"] = it.description ?: ""
+
+            channel.invokeMethod("onMarkerClick", poiMap)
+        }
+
+
+
         mapReady()
  //       val islamabad = LngLat(73.093104, 33.730494)
 //        mapController.addMarker(com.tplmaps3d.MarkerOptions().position(islamabad).title("Islamabad"))

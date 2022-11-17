@@ -20,6 +20,8 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
+late TplMapsViewController _controller;
+
 class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // This is used in the platform side to register the view.
@@ -40,45 +42,14 @@ class _MyAppState extends State<MyApp> {
       showsCompass: true,
       allGesturesEnabled: true,
       tplMapsViewCreatedCallback: _callback,
+      tPlMapsViewMarkerCallBack: _markerCallback,
     );
-    // switch (defaultTargetPlatform) {
-    //   case TargetPlatform.android:
-    //   // return widget on Android.
-    //
-    //   case TargetPlatform.iOS:
-    //   // return widget on iOS.
-    //   default:
-    //     throw UnsupportedError('Unsupported platform view');
-    // }
 
-    // return TplMapsView(
-    //   tplMapsViewCreatedCallback: _callback,
-    // );
-    // return PlatformViewLink(
-    //   viewType: viewType,
-    //   surfaceFactory:
-    //       (BuildContext context, PlatformViewController controller) {
-    //     return AndroidViewSurface(
-    //       controller: controller as AndroidViewController,
-    //       gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-    //       hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-    //     );
-    //   },
-    //   onCreatePlatformView: (PlatformViewCreationParams params) {
-    //     return PlatformViewsService.initSurfaceAndroidView(
-    //       id: params.id,
-    //       viewType: viewType,
-    //       layoutDirection: TextDirection.ltr,
-    //       creationParams: creationParams,
-    //       creationParamsCodec: const StandardMessageCodec(),
-    //       onFocus: () {
-    //         params.onFocusChanged(true);
-    //       },
-    //     )
-    //       ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-    //       ..create();
-    //   },
-    // );
+  }
+
+  void _markerCallback(String callback){
+
+    log(callback);
 
   }
 
@@ -106,5 +77,35 @@ class _MyAppState extends State<MyApp> {
     bool isPOIsEnabled = controller.isPOIsEnabled;
     print("isPOIsEnabled: $isPOIsEnabled");
     //mapMode: MapMode.DEFAULT,
+
+     _controller = controller;
+
   }
+
+  void addPolyline(){
+    _controller.addPolyLine(23.23 , 23.23 , 23.23 , 123.123);
+  }
+
+  void addCircle(){
+    _controller.addCircle(23.23 , 23.23 , 23.23 ,);
+  }
+
+  void removePolyLine(){
+    _controller.removePolyline();
+  }
+
+  void removeCircles(){
+    _controller.removeAllCircles();
+  }
+
+  // void markerClickHandler(){
+  //
+  //   TplMarkerClickHandler tplMarkerClickHandler = TplMarkerClickHandler((poiDetails) {
+  //
+  //       log(poiDetails);
+  //   });
+  //
+  // }
+
 }
+

@@ -12,3 +12,8 @@ Added some map functionality
 
 ## V - 0.0.3
 Added marker and zooming functionality
+
+## V - 1.1.0
+- Addition of map tools
+- Addition of gesture controls
+- Addition of map interaction controls
