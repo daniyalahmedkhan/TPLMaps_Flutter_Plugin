@@ -61,13 +61,40 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
+        multiDexEnabled true
+    }
+
+    buildTypes {
+
+        debug {
+            shrinkResources false
+            minifyEnabled true
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+        }
+
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
     }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.tpl.maps.sdk:maps:1.6.3'
+
+    // Places
+    implementation 'com.tpl.maps.sdk:places:1.6.5'
+
+    // Routing
+    implementation 'com.tpl.maps.sdk:routing:1.6.3'
+
     implementation 'com.google.android.material:material:1.2.0-alpha01'
    // implementation files('/Users/daniyalahmed/Users/daniyalahmed/Developer/flutter/bin/cache/artifacts/engine/android-x64/flutter.jar')
 }

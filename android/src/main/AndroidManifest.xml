@@ -23,10 +23,11 @@
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:hardwareAccelerated="true"
+        android:networkSecurityConfig="@xml/network_security"
         android:largeHeap="true">
 
         <meta-data android:name="com.tplmaps.android.sdk.API_KEY"
-            android:value="$2a$10$S0hDhKNNZgcC9JR6nPXDBDrUAqj8f5gDLP2a0lLGqCTfNKq5GpvY6" />
+            android:value="Add Maps Key Here --" />
 
         <!--TPL MAPS CONFIGURATIONS-->
         <uses-library

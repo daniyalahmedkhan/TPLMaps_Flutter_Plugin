@@ -17,3 +17,7 @@ Added marker and zooming functionality
 - Addition of map tools
 - Addition of gesture controls
 - Addition of map interaction controls
+
+
+## V - 1.3.0
+- Flutter 3.0+ support

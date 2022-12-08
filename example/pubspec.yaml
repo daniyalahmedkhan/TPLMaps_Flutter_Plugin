@@ -12,7 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  page_transition: ^2.0.9
   tplmapsflutterplugin:
+
 
     # When depending on this package from a real application you should use:
     #   tplmapsflutterplugin: ^x.y.z

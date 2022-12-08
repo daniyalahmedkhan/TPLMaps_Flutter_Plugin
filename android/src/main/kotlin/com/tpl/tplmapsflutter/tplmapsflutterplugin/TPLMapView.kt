@@ -4,16 +4,21 @@ package com.tpl.tplmapsflutter
 //2、MethodChannel：use this to method invocation
 //
 //3、EventChannel: use this to event streams
-
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.tpl.tplmapsflutter.tplmapsflutterplugin.R
 import com.tplmaps3d.*
+import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -22,7 +27,7 @@ import io.flutter.plugin.platform.PlatformView
 
 class TPLMapView internal constructor(context: Context?, id: Int, messenger: BinaryMessenger, params: Any?) : PlatformView,
 
-    MethodChannel.MethodCallHandler, AppCompatActivity(), MapView.OnMapReadyCallback{
+    MethodChannel.MethodCallHandler , MapView.OnMapReadyCallback  , FlutterActivity(), FlutterPlugin{
     private var mapViw: View
     private lateinit var map: MapView
     private lateinit var myLocBtn: ExtendedFloatingActionButton
@@ -30,8 +35,10 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
     private lateinit var mUiSettings: UISettings
     private var channel: MethodChannel
     private var args: HashMap<String?, Any?>? = null
+ //   private lateinit var activity: Activity
 //    private lateinit var methodCall: MethodCall
 //    private lateinit var methodCallResult: MethodChannel.Result
+private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
 
 
     override fun getView(): View {
@@ -42,6 +49,7 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
         channel = MethodChannel(messenger, "plugins/map")
         channel.setMethodCallHandler(this)
         mapViw = LayoutInflater.from(context).inflate(R.layout.activity_main, null)
+       // activity = this
 
         map = mapViw.findViewById(R.id.tplmap)
         args = params as HashMap<String?, Any?>?
@@ -142,7 +150,10 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
                 }
                 setMapMode(map, mapMode)
             }
-            "removeAllMarkers" -> {
+            "setUpPolyLine" -> {
+
+            }
+           "removeAllMarkers" -> {
                 mMapController.removeAllMarkers()
             }
             "addCircle" -> {
@@ -180,7 +191,7 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
 
     private fun addMarker(map: MapView, latitude: Double, longitude: Double){
         val coord = LngLat(longitude, latitude)
-        map.mapController.addMarker(com.tplmaps3d.MarkerOptions().position(coord).title("Islamabad"))
+        map.mapController.addMarker(com.tplmaps3d.MarkerOptions().position(coord).title("Marker"))
     }
     fun setZoomEnabled(map: MapView, isEnable: Boolean){
         map.mapController.uiSettings.setDoubleTapZoomInGestureEnabled(isEnable);
@@ -227,16 +238,6 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
         channel.invokeMethod("onMapReady", true)
     }
 
-    private fun addCircle(lat: Double , lng: Double , radius: Double) : Circle{
-        val circle: Circle = mMapController.addCircle(
-            CircleOptions()
-                .center(LngLat(lng, lat))
-                .radius(radius)
-                .fillColor(Color.CYAN)
-        )
-        return circle
-    }
-
     private fun addPolyline(startLat: Double , startLng: Double , endLat: Double , endLng: Double){
         val polyline: Polyline = mMapController.addPolyline(
             PolylineOptions()
@@ -246,6 +247,16 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
                 .outlineWidth(2)
                 .outlineColor(Color.BLUE)
         )
+    }
+
+    private fun addCircle(lat: Double , lng: Double , radius: Double) : Circle{
+        val circle: Circle = mMapController.addCircle(
+            CircleOptions()
+                .center(LngLat(lng, lat))
+                .radius(radius)
+                .fillColor(Color.CYAN)
+        )
+        return circle
     }
 
     private fun removePolyline(){
@@ -260,7 +271,7 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
         mMapController.removeAllCircles()
     }
 
-
+    @UiThread
     override fun onMapReady(mapController: MapController?) {
         mMapController = mapController!!
         mUiSettings = mapController.uiSettings
@@ -275,6 +286,8 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
         mUiSettings.isAllMapGesturesEnabled = allGesturesEnabled
         mMapController.setMyLocationEnabled(setMyLocationEnabled)
         mUiSettings.showMyLocationButton(myLocationButtonEnabled)
+      //  mMapController.setOnCameraChangeListener(this)
+
 
         mMapController.setOnPoiClickListener {
 
@@ -290,6 +303,7 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
             val tapPoint = mMapController.screenPositionToLngLat(PointF(x,y))
 
             val poiMap = HashMap<String, String>()
+            poiMap["On Map Long Click Listner"] = "::"
             poiMap["LatLng"] = "${tapPoint.latitude}"+",${tapPoint.longitude}"
 
             channel.invokeMethod("onLongClickListener", poiMap)
@@ -298,6 +312,7 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
 
         mMapController.setOnMarkerClickListener {
             val poiMap = HashMap<String, String>()
+            poiMap["On Marker Click Listener"] = "::"
             poiMap["LatLng"] = "${it.position.latitude}"+",${it.position.longitude}"
             poiMap["name"] = it.title
             poiMap["id"] = it.id.toString()
@@ -307,11 +322,28 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
         }
 
 
+        // Change Camera Listener V-1.3.3
+        mMapController.setOnCameraChangeEndListener{
+            runOnUiThread {
+                val poiMap = HashMap<String, String>()
+                poiMap["On Camera Change Listener"] = "::"
+                poiMap["LatLng"] = "${it.position.latitude}"+",${it.position.longitude}"
+                channel.invokeMethod("onMarkerClick", poiMap)
+            }
+        }
 
         mapReady()
  //       val islamabad = LngLat(73.093104, 33.730494)
 //        mapController.addMarker(com.tplmaps3d.MarkerOptions().position(islamabad).title("Islamabad"))
 //        map.getMapController().animateCamera(CameraPosition.fromLngLatZoom(mapController, islamabad, 12.0F), 0)
+    }
+
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        TODO("Not yet implemented")
     }
 
 

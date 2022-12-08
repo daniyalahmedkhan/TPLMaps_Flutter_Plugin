@@ -73,7 +73,11 @@ class _TplMapsViewState extends State<TplMapsView>{
       case "onPoiClickListener":
         //print("On Poi Click Listener" + call.arguments.toString());
         widget.tPlMapsViewMarkerCallBack!(call.arguments.toString());
-        break;
+        break; Container(
+          width: 250,
+          height: 250,
+          color: Colors.red,
+        );
       case "onLongClickListener":
         widget.tPlMapsViewMarkerCallBack!(call.arguments.toString());
         break;
@@ -106,11 +110,11 @@ class _TplMapsViewState extends State<TplMapsView>{
           return AndroidViewSurface(
             controller: controller as AndroidViewController,
             gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            hitTestBehavior: PlatformViewHitTestBehavior.translucent,
           );
         },
         onCreatePlatformView: (PlatformViewCreationParams params) {
-          return PlatformViewsService.initSurfaceAndroidView(
+          return PlatformViewsService.initExpensiveAndroidView(
             id: params.id,
             viewType: viewType,
             layoutDirection: TextDirection.ltr,
@@ -229,7 +233,7 @@ class TplMapsViewController {
     return _channel.invokeMethod('setMapMode', {'mapMode': value});
   }
 
-  Future<void> removeAllMarker(int value) async {
+  Future<void> removeAllMarker() async {
     return _channel.invokeMethod('removeAllMarkers');
   }
 
@@ -250,26 +254,121 @@ class TplMapsViewController {
     return _channel.invokeMethod('removeAllCircles');
   }
 
+  Future<void> setUpPolyLine() async {
+    return _channel.invokeMethod('setUpPolyLine' , {''});
+  }
+
 }
 
-// Marker Clicks handler
-// typedef TplMarkerClickHandlerCallback  = Function(String str);
-//
-// class TplMarkerClickHandler{
-//
-//   final TplMarkerClickHandlerCallback tplMarkerClickHandler;
-//
-//   Future<void> nativeMethodHandler(MethodCall call) async{
-//    // print("handler called");
-//     switch(call.method){
-//       case "onPoiClickListener":
-//         print("On Poi Click Listener" + call.arguments.toString());
-//         String args = call.arguments;
-//         tplMarkerClickHandler.call(args);
-//         break;
-//     }
-//   }
-//
-//   TplMarkerClickHandler(this.tplMarkerClickHandler);
-// }
+/*
+  * Search Manager
+  * */
+
+typedef TplSearchManagerCallback = void Function(String str);
+
+
+class TPlSearchViewController{
+
+
+  final String? query;
+  final double lat;
+  final double lng;
+  final TplSearchManagerCallback searchViewController;
+  static const _channelSearch = MethodChannel('plugins/search');
+  //late final MethodChannel mmChannel = MethodChannel('plugins/search');
+
+  Future<void> getSearchItems() async {
+    _channelSearch.setMethodCallHandler(this.nativeMethodHandler);
+    return _channelSearch.invokeMethod('searchManager' , {'query': query , 'lat': lat , 'lng' : lng});
+    // // searchViewContr // child: TplMapsView(
+    //               isShowBuildings: true,
+    //               isZoomEnabled: true,
+    //               showZoomControls: true,
+    //               isTrafficEnabled: true,
+    //               mapMode: MapMode.NIGHT,
+    //               enablePOIs: true,
+    //               setMyLocationEnabled: false,
+    //               myLocationButtonEnabled: false,
+    //               showsCompass: true,
+    //               allGesturesEnabled: true,
+    //               tplMapsViewCreatedCallback: _callback,
+    //               tPlMapsViewMarkerCallBack: _markerCallback,
+    //             ),oller.call("");
+  }
+
+
+  // Reverse Geocoding
+  Future<void> getReverseGeocoding() async {
+    _channelSearch.setMethodCallHandler(this.nativeMethodHandler); // child: TplMapsView(
+                //   isShowBuildings: true,
+                //   isZoomEnabled: true,
+                //   showZoomControls: true,
+                //   isTrafficEnabled: true,
+                //   mapMode: MapMode.NIGHT,
+                //   enablePOIs: true,
+                //   setMyLocationEnabled: false,
+                //   myLocationButtonEnabled: false,
+                //   showsCompass: true,
+                //   allGesturesEnabled: true,
+                //   tplMapsViewCreatedCallback: _callback,
+                //   tPlMapsViewMarkerCallBack: _markerCallback,
+                // ),dHandler);
+    return _channelSearch.invokeMethod('reverseSearchManager' , {'lat': lat , 'lng' : lng});
+    // searchViewController.call("");
+  }
+
+
+  Future<void> nativeMethodHandler(MethodCall call) async{
+    print("handler called");
+    switch(call.method){
+      case "searchManagerResult":
+        String args = call.arguments;
+        searchViewController.call(args);
+        break;
+    }
+  }
+
+  TPlSearchViewController(this.query, this.lat, this.lng , this.searchViewController);
+}
+
+
+/*
+* TPl Routing
+* */
+
+typedef TplRoutingResultCallback = Function(String str);
+
+class TPLRoutingViewController{
+  final double startLat;
+  final double startLng;
+  final double desLat;
+  final double desLng;
+  static const _channelSearch = MethodChannel('plugins/route');
+  final TplRoutingResultCallback tplRoutingResultCallback;
+
+
+  Future<void> getSearchItems() async {
+    _channelSearch.setMethodCallHandler(this.nativeMethodHandler);
+    return
+      _channelSearch.invokeMethod('routing' , {'startLat' : startLat ,
+        'startLng' : startLng,
+        'desLat' : desLat,
+        'desLng' : desLng});
+
+
+  }
+
+  Future<void> nativeMethodHandler(MethodCall call) async{
+    switch(call.method){
+      case "routingResult":
+        String args = call.arguments;
+        tplRoutingResultCallback.call(args);
+        break;
+    }
+  }
+
+  TPLRoutingViewController(
+      this.startLat, this.startLng, this.desLat, this.desLng , this.tplRoutingResultCallback);
+}
+
 

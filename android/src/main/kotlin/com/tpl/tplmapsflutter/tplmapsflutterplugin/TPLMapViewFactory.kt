@@ -2,6 +2,8 @@ package com.tpl.tplmapsflutter
 
 
 import android.content.Context
+import com.tpl.tplmapsflutter.tplmapsflutterplugin.TPLPlacesSearch
+import com.tpl.tplmapsflutter.tplmapsflutterplugin.TPLRouting
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.StandardMessageCodec
@@ -13,6 +15,8 @@ class TPLMapViewFactory internal constructor(messenger: BinaryMessenger) : Platf
 
     override fun create(context: Context?, viewId: Int, args: Any?): PlatformView {
         val params: Object? = args as? Object
+        val tplPlacesSearch = TPLPlacesSearch(context, viewId, bMessenger, args)
+        val tplRoutingPlaces = TPLRouting(context, viewId, bMessenger, args)
         return TPLMapView(context, viewId, bMessenger, args)
     }
 }
