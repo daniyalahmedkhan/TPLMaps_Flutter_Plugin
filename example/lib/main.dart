@@ -12,6 +12,8 @@ import 'package:page_transition/page_transition.dart';
 import 'package:tplmapsflutterplugin/TplMapsView.dart';
 import 'package:tplmapsflutterplugin/tplmapsflutterplugin.dart';
 import 'package:tplmapsflutterplugin_example/second.dart';
+import 'package:drawable/drawable.dart';
+
 
 
 void main() {
@@ -90,6 +92,7 @@ class _MyAppState extends State<MyHomePage> {
               isZoomEnabled: true,
               showZoomControls: true,
               isTrafficEnabled: true,
+              longClickMarkerEnable: false,
               mapMode: MapMode.NIGHT,
               enablePOIs: true,
               setMyLocationEnabled: false,
@@ -127,6 +130,7 @@ class _MyAppState extends State<MyHomePage> {
                     onChanged: (String? newValue) {
                       setState(() {
                         dropdownvalue = newValue!;
+                        _controller.setZoomLevel(11.0);
                       });
                     },
                   ),
@@ -170,8 +174,14 @@ class _MyAppState extends State<MyHomePage> {
      controller.showsCompass(false);
 
      controller.setCameraPositionAnimated(33.698047971892045, 73.06930062598059, 14.0);
-     controller.addMarker(33.705349, 73.069788);
-     controller.addMarker(33.698047971892045, 73.06930062598059);
+
+    // controller.addMarker(33.698047971892045, 73.06930062598059);
+
+
+    controller.addMarkerCustomMarker(33.698047971892045, 73.06930062598059, 50 , 50);
+
+    controller.addMarker(33.705349, 73.069788);
+
     // controller.allGesturesEnabled(false);
      controller.setMapMode(MapMode.DEFAULT);
     bool isBuildingsEnabled = controller.isBuildingEnabled;

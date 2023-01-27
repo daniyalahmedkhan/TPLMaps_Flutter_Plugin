@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ffi';
 
+import 'package:drawable/drawable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,7 @@ class TplMapsView extends StatefulWidget {
   final TplMapsViewCreatedCallback? tplMapsViewCreatedCallback;
   final TPlMapsViewMarkerCallBack? tPlMapsViewMarkerCallBack;
   final isZoomEnabled;
+  final longClickMarkerEnable;
   final isShowBuildings;
   final showZoomControls;
   final isTrafficEnabled;
@@ -35,6 +37,7 @@ class TplMapsView extends StatefulWidget {
     this.tPlMapsViewMarkerCallBack,
     this.isShowBuildings = false,
     this.isZoomEnabled = true,
+    this.longClickMarkerEnable = false,
     this.showZoomControls = false,
     this.isTrafficEnabled = false,
     this.enablePOIs = true,
@@ -102,7 +105,8 @@ class _TplMapsViewState extends State<TplMapsView>{
         "showsCompass" : widget.showsCompass,
         "allGesturesEnabled": widget.allGesturesEnabled,
         "myLocationButtonEnabled": widget.myLocationButtonEnabled,
-        "setMyLocationEnabled" : widget.setMyLocationEnabled
+        "setMyLocationEnabled" : widget.setMyLocationEnabled,
+        "longClickMarkerEnable" : widget.longClickMarkerEnable
       };
       return PlatformViewLink(
         viewType: viewType,
@@ -175,13 +179,22 @@ class TplMapsViewController {
   bool isTrafficEnabled = false;
   bool isPOIsEnabled = false;
 
-    Future<void> setCameraPositionAnimated(double latitude,double longitude, double zoom) async {
+  Future<void> setCameraPositionAnimated(double latitude,double longitude, double zoom) async {
     print("camera animated called");
     return _channel.invokeMethod('setCameraPositionAnimated', {'latitude': latitude,'longitude':longitude, 'zoom':zoom});
   }
 
+  Future<void> setZoomLevel(double zoom) async {
+    print("camera animated called");
+    return _channel.invokeMethod('setZoomLevel', {'zoom':zoom});
+  }
+
   Future<void> addMarker(double latitude,double longitude) async {
     return _channel.invokeMethod('addMarker', {'latitude': latitude,'longitude':longitude});
+  }
+
+  Future<void> addMarkerCustomMarker(double latitude,double longitude, int width, int height) async {
+    return _channel.invokeMethod('addMarkerCustomMarker', {'latitude': latitude,'longitude':longitude , 'width': width, 'height':height});
   }
 
   Future<void> draggable(bool value) async {

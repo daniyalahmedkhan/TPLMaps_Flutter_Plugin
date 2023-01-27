@@ -4,7 +4,7 @@ package com.tpl.tplmapsflutter
 //2、MethodChannel：use this to method invocation
 //
 //3、EventChannel: use this to event streams
-import android.app.Activity
+
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
@@ -13,10 +13,10 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.UiThread
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.tpl.tplmapsflutter.tplmapsflutterplugin.R
 import com.tplmaps3d.*
+import com.tplmaps3d.sdk.model.IconSize
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.BinaryMessenger
@@ -35,6 +35,7 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
     private lateinit var mUiSettings: UISettings
     private var channel: MethodChannel
     private var args: HashMap<String?, Any?>? = null
+    private var longClickMarkerEnable: Boolean = false;
  //   private lateinit var activity: Activity
 //    private lateinit var methodCall: MethodCall
 //    private lateinit var methodCallResult: MethodChannel.Result
@@ -58,6 +59,7 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         var isShowBuildings: Boolean = args?.get("isShowBuildings") as Boolean
         var mapMode = args?.get("mapMode")
         var enablePOIs = args?.get("enablePOIs") as Boolean
+        longClickMarkerEnable = args?.get("longClickMarkerEnable") as Boolean
 
         map.setTrafficEnabled(isTrafficEnabled);
         map.setBuildingsEnabled(isShowBuildings);
@@ -83,10 +85,30 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
                 var zoom: Double = call.argument<Double>("zoom") ?: 0.0
                 setCameraPositionAnimated(map, lat, long, zoom)
             }
+            "setZoomLevel" -> {
+                var zoom: Double = call.argument<Double>("zoom") ?: 0.0
+                setZoomLevel(map, zoom.toString().toFloat())
+            }
             "addMarker" -> {
                 var long : Double = call.argument<Double>("longitude") ?: 0.0
                 var lat: Double = call.argument<Double>("latitude") ?: 0.0
                 addMarker(map, lat, long)
+            }
+            "addMarkerCustomMarker" -> {
+                var long : Double = call.argument<Double>("longitude") ?: 0.0
+                var lat: Double = call.argument<Double>("latitude") ?: 0.0
+                var width: Int = call.argument<Int>("width") ?: 50
+                var height: Int = call.argument<Int>("height") ?: 50
+               // var img: BitmapDrawable? = call.argument<BitmapDrawable>("img")
+
+              //  val img = context.getResources().getIdentifier("custom", "drawable", context.getPackageName());
+
+//                val resID = resources.getIdentifier(
+//                    "customnew", "drawable",
+//                    this.packageName
+//                )
+
+                addMarkerCustomMarker(map, lat, long , width , height , R.drawable.custom)
             }
             "setZoomEnabled" -> {
                 var isEnable: Boolean = call.argument<Boolean>("isEnable") ?: false
@@ -189,10 +211,23 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         ), 0)
     }
 
+    private fun setZoomLevel(map: MapView, zoom: Float){
+        map.mapController.setZoomBy(zoom)
+    }
+
     private fun addMarker(map: MapView, latitude: Double, longitude: Double){
         val coord = LngLat(longitude, latitude)
-        map.mapController.addMarker(com.tplmaps3d.MarkerOptions().position(coord).title("Marker"))
+        val marker = map.mapController.addMarker(com.tplmaps3d.MarkerOptions().position(coord).title("Marker"))
+
     }
+
+    private fun addMarkerCustomMarker(map: MapView, latitude: Double, longitude: Double, width: Int, height: Int, img: Int){
+        val coord = LngLat(longitude, latitude)
+        val marker = map.mapController.addMarker(com.tplmaps3d.MarkerOptions().position(coord).title("Marker"))
+       // val drawableId: Int = img.toString().toInt()
+        marker.setIcon(IconFactory.fromResource(img, IconSize(width, height)))
+    }
+
     fun setZoomEnabled(map: MapView, isEnable: Boolean){
         map.mapController.uiSettings.setDoubleTapZoomInGestureEnabled(isEnable);
     }
@@ -300,14 +335,16 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         }
 
         mMapController.setOnMapLongClickListener { x, y ->
-            val tapPoint = mMapController.screenPositionToLngLat(PointF(x,y))
 
-            val poiMap = HashMap<String, String>()
-            poiMap["On Map Long Click Listner"] = "::"
-            poiMap["LatLng"] = "${tapPoint.latitude}"+",${tapPoint.longitude}"
+            if (longClickMarkerEnable){
+                val tapPoint = mMapController.screenPositionToLngLat(PointF(x,y))
+                val poiMap = HashMap<String, String>()
+                poiMap["On Map Long Click Listner"] = "::"
+                poiMap["LatLng"] = "${tapPoint.latitude}"+",${tapPoint.longitude}"
+                channel.invokeMethod("onLongClickListener", poiMap)
+                addMarker(map, tapPoint.latitude, tapPoint.longitude)
+            }
 
-            channel.invokeMethod("onLongClickListener", poiMap)
-            addMarker(map, tapPoint.latitude, tapPoint.longitude)
         }
 
         mMapController.setOnMarkerClickListener {
@@ -317,7 +354,6 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
             poiMap["name"] = it.title
             poiMap["id"] = it.id.toString()
             poiMap["desc"] = it.description ?: ""
-
             channel.invokeMethod("onMarkerClick", poiMap)
         }
 
