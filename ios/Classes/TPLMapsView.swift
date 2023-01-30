@@ -69,13 +69,27 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
                         let zoom = args["zoom"] as! Double
                         self.setCameraPositionAnimated(self.map, latitude: latitude, longitude: longitude, zoom: zoom)
                         break
+
+                     case "setZoomLevel":
+                       guard let args = call.arguments as? [String : Any] else {return}
+                       let zoom = args["zoom"] as! Double
+                       self.animateToZoom(self.map, zoom: zoom)
+                       break
+
                     case "addMarker":
                         guard let args = call.arguments as? [String : Any] else {return}
                         let latitude = args["latitude"] as! Double
                         let longitude = args["longitude"] as! Double
                         self.addMarker(self.map, latitude: latitude, longitude: longitude)
-                        
                         break
+                    case "addMarkerCustomMarker":
+                         guard let args = call.arguments as? [String : Any] else {return}
+                         let latitude = args["latitude"] as! Double
+                         let longitude = args["longitude"] as! Double
+                         let width = args["width"] as! Int
+                         let height = args["height"] as! Int
+                         self.addCustomMarker(self.map, latitude: latitude, longitude: longitude)
+                         break
                     case "setZoomEnabled":
                         guard let args = call.arguments as? [String : Any] else {return}
                         let isEnable = args["isEnable"] as! Bool
@@ -172,21 +186,33 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
     func addMarker(_ mapView: TPLMapView, latitude: Double, longitude: Double){
         let coord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         let marker:TPLMaps.Marker = TPLMaps.Marker.markerWithPosition(CLLocationCoordinate2D: coord)
-        
         mapView.addMarker(Marker: marker)
     }
+
+    func addCustomMarker(_ mapView: TPLMapView, latitude: Double, longitude: Double){
+         let coord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+         let marker:TPLMaps.Marker = TPLMaps.Marker.markerWithPosition(CLLocationCoordinate2D: coord)
+         marker.icon = UIImage(named: "custom.png")
+         mapView.addMarker(Marker: marker)
+    }
+
     func setCameraPositionAnimated(_ mapView: TPLMapView, latitude: Double, longitude: Double, zoom: Double){
-        
+
         let coord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         mapView.setCameraPositionAnimated(TPLMaps.CameraPosition.init(location: coord, zoom: Float(zoom)))
-        
+
         //let marker:TPLMaps.Marker = TPLMaps.Marker.markerWithPosition(CLLocationCoordinate2D: coord)
-        
+
         //let marker2:TPLMaps.Marker = TPLMaps.Marker.markerWithPosition(CLLocationCoordinate2D: coord2)
-        
+
         //mapView.addMarker(Marker: marker)
         //mapView.addMarker(Marker: marker2)
     }
+
+        func animateToZoom(_ mapView: TPLMapView, zoom: Double){
+            mapView.animateToZoom(zoom: Float(zoom))
+        }
+
     func mapViewDidCompleteLoading(_ mapView: TPLMapView) {
         
         
