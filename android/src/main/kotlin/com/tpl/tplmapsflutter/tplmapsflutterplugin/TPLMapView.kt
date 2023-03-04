@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.UiThread
@@ -25,9 +26,14 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
 
-class TPLMapView internal constructor(context: Context?, id: Int, messenger: BinaryMessenger, params: Any?) : PlatformView,
+class TPLMapView internal constructor(
+    context: Context?,
+    id: Int,
+    messenger: BinaryMessenger,
+    params: Any?
+) : PlatformView,
 
-    MethodChannel.MethodCallHandler , MapView.OnMapReadyCallback  , FlutterActivity(), FlutterPlugin{
+    MethodChannel.MethodCallHandler, MapView.OnMapReadyCallback, FlutterActivity(), FlutterPlugin {
     private var mapViw: View
     private lateinit var map: MapView
     private lateinit var myLocBtn: ExtendedFloatingActionButton
@@ -36,10 +42,11 @@ class TPLMapView internal constructor(context: Context?, id: Int, messenger: Bin
     private var channel: MethodChannel
     private var args: HashMap<String?, Any?>? = null
     private var longClickMarkerEnable: Boolean = false;
- //   private lateinit var activity: Activity
+
+    //   private lateinit var activity: Activity
 //    private lateinit var methodCall: MethodCall
 //    private lateinit var methodCallResult: MethodChannel.Result
-private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
+    private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
 
 
     override fun getView(): View {
@@ -50,24 +57,25 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         channel = MethodChannel(messenger, "plugins/map")
         channel.setMethodCallHandler(this)
         mapViw = LayoutInflater.from(context).inflate(R.layout.activity_main, null)
-       // activity = this
+        // activity = this
 
         map = mapViw.findViewById(R.id.tplmap)
         args = params as HashMap<String?, Any?>?
         //var keys: MutableSet<String?> = args!!.keys
-        var isTrafficEnabled : Boolean = args?.get("isTrafficEnabled") as Boolean
+        var isTrafficEnabled: Boolean = args?.get("isTrafficEnabled") as Boolean
         var isShowBuildings: Boolean = args?.get("isShowBuildings") as Boolean
         var mapMode = args?.get("mapMode")
         var enablePOIs = args?.get("enablePOIs") as Boolean
         longClickMarkerEnable = args?.get("longClickMarkerEnable") as Boolean
 
+
+
         map.setTrafficEnabled(isTrafficEnabled);
         map.setBuildingsEnabled(isShowBuildings);
         map.setPOIsEnabled(enablePOIs)
-        if(mapMode == 1){
+        if (mapMode == 1) {
             map.mapMode = MapMode.DEFAULT
-        }
-        else{
+        } else {
             map.mapMode = MapMode.NIGHT
         }
         map.loadMapAsync(this);
@@ -77,10 +85,11 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
     override fun dispose() {
         print("dispose")
     }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "setCameraPositionAnimated" -> {
-                var long : Double = call.argument<Double>("longitude") ?: 0.0
+                var long: Double = call.argument<Double>("longitude") ?: 0.0
                 var lat: Double = call.argument<Double>("latitude") ?: 0.0
                 var zoom: Double = call.argument<Double>("zoom") ?: 0.0
                 setCameraPositionAnimated(map, lat, long, zoom)
@@ -89,26 +98,30 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
                 var zoom: Double = call.argument<Double>("zoom") ?: 0.0
                 setZoomLevel(map, zoom.toString().toFloat())
             }
+            "setZoomFixedCenter" -> {
+                var zoom: Double = call.argument<Double>("zoom") ?: 0.0
+                setZoomLevelFixedCenter(map, zoom.toString().toFloat())
+            }
             "addMarker" -> {
-                var long : Double = call.argument<Double>("longitude") ?: 0.0
+                var long: Double = call.argument<Double>("longitude") ?: 0.0
                 var lat: Double = call.argument<Double>("latitude") ?: 0.0
                 addMarker(map, lat, long)
             }
             "addMarkerCustomMarker" -> {
-                var long : Double = call.argument<Double>("longitude") ?: 0.0
+                var long: Double = call.argument<Double>("longitude") ?: 0.0
                 var lat: Double = call.argument<Double>("latitude") ?: 0.0
                 var width: Int = call.argument<Int>("width") ?: 50
                 var height: Int = call.argument<Int>("height") ?: 50
-               // var img: BitmapDrawable? = call.argument<BitmapDrawable>("img")
+                // var img: BitmapDrawable? = call.argument<BitmapDrawable>("img")
 
-              //  val img = context.getResources().getIdentifier("custom", "drawable", context.getPackageName());
+                //  val img = context.getResources().getIdentifier("custom", "drawable", context.getPackageName());
 
 //                val resID = resources.getIdentifier(
 //                    "customnew", "drawable",
 //                    this.packageName
 //                )
 
-                addMarkerCustomMarker(map, lat, long , width , height , R.drawable.custom)
+                addMarkerCustomMarker(map, lat, long, width, height, R.drawable.custom)
             }
             "setZoomEnabled" -> {
                 var isEnable: Boolean = call.argument<Boolean>("isEnable") ?: false
@@ -164,10 +177,9 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
             "setMapMode" -> {
                 var value: Int = call.argument<Int>("mapMode") ?: 1
                 var mapMode: MapMode;
-                if(value == 1){
+                if (value == 1) {
                     mapMode = MapMode.DEFAULT
-                }
-                else{
+                } else {
                     mapMode = MapMode.NIGHT
                 }
                 setMapMode(map, mapMode)
@@ -175,24 +187,24 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
             "setUpPolyLine" -> {
 
             }
-           "removeAllMarkers" -> {
+            "removeAllMarkers" -> {
                 mMapController.removeAllMarkers()
             }
             "addCircle" -> {
-                var long : Double = call.argument<Double>("longitude") ?: 0.0
+                var long: Double = call.argument<Double>("longitude") ?: 0.0
                 var lat: Double = call.argument<Double>("latitude") ?: 0.0
                 var radius: Double = call.argument<Double>("radius") ?: 0.0
 
-                addCircle(lat , long , radius)
+                addCircle(lat, long, radius)
             }
             "addPolyline" -> {
-                var long : Double = call.argument<Double>("startLongitude") ?: 0.0
+                var long: Double = call.argument<Double>("startLongitude") ?: 0.0
                 var lat: Double = call.argument<Double>("startLatitude") ?: 0.0
                 var endLat: Double = call.argument<Double>("endLatitude") ?: 0.0
                 var endLong: Double = call.argument<Double>("endLongitude") ?: 0.0
                 //var radius: Double = call.argument<Double>("radius") ?: 0.0
 
-                addPolyline(lat , long , endLat , endLong )
+                addPolyline(lat, long, endLat, endLong)
             }
             "removePolyline" -> {
                 removePolyline()
@@ -204,76 +216,116 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         }
     }
 
-    private fun setCameraPositionAnimated(map: MapView, latitude: Double, longitude: Double, zoom: Double){
+    private fun setCameraPositionAnimated(
+        map: MapView,
+        latitude: Double,
+        longitude: Double,
+        zoom: Double
+    ) {
         val coord = LngLat(longitude, latitude)
-        map.mapController.animateCamera(CameraPosition.fromLngLatZoom(mMapController, coord,
-            zoom.toFloat()
-        ), 0)
+        map.mapController.animateCamera(
+            CameraPosition.fromLngLatZoom(
+                mMapController, coord,
+                zoom.toFloat()
+            ), 0
+        )
     }
 
-    private fun setZoomLevel(map: MapView, zoom: Float){
+    private fun setZoomLevel(map: MapView, zoom: Float) {
         map.mapController.setZoomBy(zoom)
     }
 
-    private fun addMarker(map: MapView, latitude: Double, longitude: Double){
-        val coord = LngLat(longitude, latitude)
-        val marker = map.mapController.addMarker(com.tplmaps3d.MarkerOptions().position(coord).title("Marker"))
+    private fun setZoomLevelFixedCenter(map: MapView, zoom: Float) {
+        var lngLat = LngLat(
+            mMapController.mapBoundsCenter.longitude,
+            mMapController.mapBoundsCenter.latitude
+        )
+        var cameraPosition = CameraPosition(
+            mMapController,
+            lngLat,
+            mMapController.mapCameraPosition.zoom + 1,
+            0F,
+            0F
+        )
+//        mMapController.setZoomBy(mMapController.mapCameraPosition.zoom+1)
+        mMapController.setCamera(cameraPosition)
+        Log.d("LATLNGCHECK" ,  "${mMapController.mapBoundsCenter.latitude};${mMapController.mapBoundsCenter.longitude}")
+      //  mMapController.animateCamera(cameraPosition , 100)
+
 
     }
 
-    private fun addMarkerCustomMarker(map: MapView, latitude: Double, longitude: Double, width: Int, height: Int, img: Int){
+    private fun addMarker(map: MapView, latitude: Double, longitude: Double) {
         val coord = LngLat(longitude, latitude)
-        val marker = map.mapController.addMarker(com.tplmaps3d.MarkerOptions().position(coord).title("Marker"))
-       // val drawableId: Int = img.toString().toInt()
+        val marker = map.mapController.addMarker(
+            com.tplmaps3d.MarkerOptions().position(coord).title("Marker")
+        )
+
+    }
+
+    private fun addMarkerCustomMarker(
+        map: MapView,
+        latitude: Double,
+        longitude: Double,
+        width: Int,
+        height: Int,
+        img: Int
+    ) {
+        val coord = LngLat(longitude, latitude)
+        val marker = map.mapController.addMarker(
+            com.tplmaps3d.MarkerOptions().position(coord).title("Marker")
+        )
+        // val drawableId: Int = img.toString().toInt()
         marker.setIcon(IconFactory.fromResource(img, IconSize(width, height)))
     }
 
-    fun setZoomEnabled(map: MapView, isEnable: Boolean){
+    fun setZoomEnabled(map: MapView, isEnable: Boolean) {
         map.mapController.uiSettings.setDoubleTapZoomInGestureEnabled(isEnable);
     }
 
-    private fun showBuildings(map: MapView, isEnable: Boolean){
+    private fun showBuildings(map: MapView, isEnable: Boolean) {
         map.setBuildingsEnabled(isEnable);
         channel.invokeMethod("setBuildingsEnabled", map.isBuildingEnabled)
     }
 
-    private fun showZoomControls(map: MapView, isEnable: Boolean){
+    private fun showZoomControls(map: MapView, isEnable: Boolean) {
         map.mapController.uiSettings.showZoomControls(isEnable);
     }
 
-    private fun setTrafficEnabled(map: MapView, isEnable: Boolean){
+    private fun setTrafficEnabled(map: MapView, isEnable: Boolean) {
         map.isTrafficEnabled = isEnable;
     }
 
-    private fun enablePOIs(map: MapView, isEnable: Boolean){
+    private fun enablePOIs(map: MapView, isEnable: Boolean) {
         map.isPOIsEnabled = isEnable;
     }
 
-    private fun showsCompass(map: MapView, isEnable: Boolean){
+    private fun showsCompass(map: MapView, isEnable: Boolean) {
         map.mapController.uiSettings.showCompass(isEnable);
     }
 
-    private fun allGesturesEnabled(map: MapView, isEnable: Boolean){
+    private fun allGesturesEnabled(map: MapView, isEnable: Boolean) {
         map.mapController.uiSettings.isAllMapGesturesEnabled = isEnable;
     }
 
-    private fun myLocationButtonEnabled(map: MapView, isEnable: Boolean){
+    private fun myLocationButtonEnabled(map: MapView, isEnable: Boolean) {
         map.mapController.uiSettings.showMyLocationButton(isEnable);
     }
 
-    private fun setMyLocationEnabled(map: MapView, isEnable: Boolean){
+    private fun setMyLocationEnabled(map: MapView, isEnable: Boolean) {
         map.mapController.setMyLocationEnabled(isEnable);
     }
-    private fun setMapMode(map: MapView, mapMode: MapMode){
+
+    private fun setMapMode(map: MapView, mapMode: MapMode) {
         map.mapMode = mapMode
     }
 
 
-    private fun mapReady(){
+    private fun mapReady() {
         channel.invokeMethod("onMapReady", true)
     }
 
-    private fun addPolyline(startLat: Double , startLng: Double , endLat: Double , endLng: Double){
+    private fun addPolyline(startLat: Double, startLng: Double, endLat: Double, endLng: Double) {
         val polyline: Polyline = mMapController.addPolyline(
             PolylineOptions()
                 .add(LngLat(startLng, startLat), LngLat(endLng, endLat))
@@ -284,7 +336,7 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         )
     }
 
-    private fun addCircle(lat: Double , lng: Double , radius: Double) : Circle{
+    private fun addCircle(lat: Double, lng: Double, radius: Double): Circle {
         val circle: Circle = mMapController.addCircle(
             CircleOptions()
                 .center(LngLat(lng, lat))
@@ -294,21 +346,29 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         return circle
     }
 
-    private fun removePolyline(){
+    private fun removePolyline() {
         mMapController.removeAllPolyLines()
     }
 
-    private fun removeCircle(circle: Circle){
+    private fun removeCircle(circle: Circle) {
         mMapController.removeCircle(circle)
     }
 
-    private fun removeAllCircles(){
+    private fun removeAllCircles() {
         mMapController.removeAllCircles()
+    }
+
+    private fun mapZoomFixedCenter() {
+
     }
 
     @UiThread
     override fun onMapReady(mapController: MapController?) {
         mMapController = mapController!!
+
+        map.mapController.setMyLocationEnabled(
+            true, MapController.MyLocationArg.ZOOM_LOCATION_ON_FIRST_FIX);
+
         mUiSettings = mapController.uiSettings
         var isZoomEnabled: Boolean = args?.get("isZoomEnabled") as Boolean
         var showsCompass = args?.get("showsCompass") as Boolean
@@ -321,13 +381,13 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         mUiSettings.isAllMapGesturesEnabled = allGesturesEnabled
         mMapController.setMyLocationEnabled(setMyLocationEnabled)
         mUiSettings.showMyLocationButton(myLocationButtonEnabled)
-      //  mMapController.setOnCameraChangeListener(this)
+        //  mMapController.setOnCameraChangeListener(this)
 
 
         mMapController.setOnPoiClickListener {
 
             val poiMap = HashMap<String, String>()
-            poiMap["LatLng"] = "${it.lngLat.latitude}"+",${it.lngLat.longitude}"
+            poiMap["LatLng"] = "${it.lngLat.latitude}" + ",${it.lngLat.longitude}"
             poiMap["name"] = it.name
             poiMap["id"] = it.id
 
@@ -336,11 +396,11 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
 
         mMapController.setOnMapLongClickListener { x, y ->
 
-            if (longClickMarkerEnable){
-                val tapPoint = mMapController.screenPositionToLngLat(PointF(x,y))
+            if (longClickMarkerEnable) {
+                val tapPoint = mMapController.screenPositionToLngLat(PointF(x, y))
                 val poiMap = HashMap<String, String>()
                 poiMap["On Map Long Click Listner"] = "::"
-                poiMap["LatLng"] = "${tapPoint.latitude}"+",${tapPoint.longitude}"
+                poiMap["LatLng"] = "${tapPoint.latitude}" + ",${tapPoint.longitude}"
                 channel.invokeMethod("onLongClickListener", poiMap)
                 addMarker(map, tapPoint.latitude, tapPoint.longitude)
             }
@@ -350,7 +410,7 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
         mMapController.setOnMarkerClickListener {
             val poiMap = HashMap<String, String>()
             poiMap["On Marker Click Listener"] = "::"
-            poiMap["LatLng"] = "${it.position.latitude}"+",${it.position.longitude}"
+            poiMap["LatLng"] = "${it.position.latitude}" + ",${it.position.longitude}"
             poiMap["name"] = it.title
             poiMap["id"] = it.id.toString()
             poiMap["desc"] = it.description ?: ""
@@ -359,17 +419,18 @@ private var uiThreadHandler: Handler? = Handler(Looper.getMainLooper())
 
 
         // Change Camera Listener V-1.3.3
-        mMapController.setOnCameraChangeEndListener{
+        mMapController.setOnCameraChangeEndListener {
             runOnUiThread {
                 val poiMap = HashMap<String, String>()
                 poiMap["On Camera Change Listener"] = "::"
-                poiMap["LatLng"] = "${it.position.latitude}"+",${it.position.longitude}"
+                poiMap["LatLng"] = "${it.position.latitude}" + ",${it.position.longitude}"
                 channel.invokeMethod("onMarkerClick", poiMap)
+                Log.d("LatLngCAMERA" , "${it.position.latitude}" + ",${it.position.longitude}")
             }
         }
 
         mapReady()
- //       val islamabad = LngLat(73.093104, 33.730494)
+        //       val islamabad = LngLat(73.093104, 33.730494)
 //        mapController.addMarker(com.tplmaps3d.MarkerOptions().position(islamabad).title("Islamabad"))
 //        map.getMapController().animateCamera(CameraPosition.fromLngLatZoom(mapController, islamabad, 12.0F), 0)
     }

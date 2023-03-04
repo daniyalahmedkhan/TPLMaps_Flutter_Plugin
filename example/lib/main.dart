@@ -44,6 +44,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 late TplMapsViewController _controller;
+double zoomLevel = 8;
 
 class _MyAppState extends State<MyHomePage> {
 
@@ -95,8 +96,8 @@ class _MyAppState extends State<MyHomePage> {
               longClickMarkerEnable: false,
               mapMode: MapMode.NIGHT,
               enablePOIs: true,
-              setMyLocationEnabled: false,
-              myLocationButtonEnabled: false,
+              setMyLocationEnabled: true,
+              myLocationButtonEnabled: true,
               showsCompass: true,
               allGesturesEnabled: true,
               tplMapsViewCreatedCallback: _callback,
@@ -138,12 +139,28 @@ class _MyAppState extends State<MyHomePage> {
 
               )
           ),
-          Container(
-            margin: EdgeInsets.fromLTRB(10, 50, 10, 0),
-            width: double.infinity,
-            height: 50,
-            color: Colors.red,
-            child: Text("Text on the Map", style: TextStyle(color: Colors.white , fontSize: 20),  textAlign: TextAlign.center,),
+          GestureDetector(
+            onTap: (){
+              _controller.setZoomFixedCenter(zoomLevel);
+            },
+            child: Container(
+              margin: EdgeInsets.fromLTRB(10, 50, 10, 0),
+              width: double.infinity,
+              height: 50,
+              color: Colors.red,
+              child: Text("Text on the Map", style: TextStyle(color: Colors.white , fontSize: 20),  textAlign: TextAlign.center,),
+            ),
+          ),
+          GestureDetector(
+            onTap: (){
+              zoomLevel += 1;
+              _controller.setZoomFixedCenter(zoomLevel);
+            },
+            child: Center(
+              child: Container(
+                child: Image.asset('assets/droppin.png', width: 30 , height: 30,),
+              ),
+            ),
           )
         ],
 
@@ -166,7 +183,7 @@ class _MyAppState extends State<MyHomePage> {
     controller.showBuildings(false);
      controller.showBuildings(false);
     // controller.setZoomEnabled(false);
-     controller.showZoomControls(false);
+     controller.showZoomControls(true);
      controller.setTrafficEnabled(false);
      controller.enablePOIs(true);
      controller.setMyLocationEnabled(true);
@@ -193,7 +210,6 @@ class _MyAppState extends State<MyHomePage> {
     //mapMode: MapMode.DEFAULT,
 
      _controller = controller;
-
   }
 
   void addPolyline(){

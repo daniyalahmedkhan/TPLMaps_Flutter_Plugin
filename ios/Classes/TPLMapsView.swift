@@ -13,6 +13,7 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
     
     var map : TPLMaps.TPLMapView
     var myLocationButtonEnabled: Bool = false
+    var mapChannel : FlutterMethodChannel
    // private var map: TPLMaps.TPLMapView
     init(
                 frame: CGRect,
@@ -22,6 +23,8 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
             ) {
                 self.map = TPLMaps.TPLMapView.init()
                 //self.map.zoomEnabled = true
+                mapChannel = FlutterMethodChannel(name: "plugins/map",
+                    binaryMessenger: messenger!)
                 
                 super.init()
                 self.map.delegate = self
@@ -54,10 +57,12 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
                     else{
                         self.map.mapMode = MapViewTheme.NIGHT
                     }
+                    
+            
+                
                 }
                 
-                let mapChannel = FlutterMethodChannel(name: "plugins/map",
-                    binaryMessenger: messenger!)
+               
                 
                 mapChannel.setMethodCallHandler({
                       (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
@@ -194,6 +199,8 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
          let marker:TPLMaps.Marker = TPLMaps.Marker.markerWithPosition(CLLocationCoordinate2D: coord)
          marker.icon = UIImage(named: "custom.png")
          mapView.addMarker(Marker: marker)
+        
+        print("CUSTOM MARKER ADDED ---")
     }
 
     func setCameraPositionAnimated(_ mapView: TPLMapView, latitude: Double, longitude: Double, zoom: Double){
@@ -217,4 +224,38 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
         
         
     }
+    
+    func mapView(_ mapView: TPLMapView, cameraPositionDidEndChange cameraPosition: CameraPosition){
+        print("CAMERA CHANGE---")
+//        print(cameraPosition)
+//        DispatchQueue.main.async {
+//            self.mapChannel.invokeMethod("onMarkerClick", arguments: "nil")
+//                }
+    }
+    
+    func mapView(_ mapView: TPLMapView, regionWillChangeAnimated animated: Bool){
+        print("Region CHANGE---")
+      
+        let lat = String(format: "%f", mapView.cameraPosition.location.latitude);
+        let lng = String(format: "%f", mapView.cameraPosition.location.longitude);
+        let latlng = lat+","+lng;
+        
+        let poiMap = ["LatLng": latlng];
+
+        DispatchQueue.main.async {
+            self.mapChannel.invokeMethod("onMarkerClick", arguments: poiMap)
+                }
+
+    }
+    
+    func mapView(_ mapView: TPLMapView, cameraPositionDidChange cameraPosition: CameraPosition){
+        print("CAMERA CHANGING---")
+    }
+    
+    func mapView(_ mapView: TPLMapView, didSelect marker: Marker){
+        print("MARKER CLICK---")
+    }
+
+    
+
 }

@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'tplmapsflutterplugin'
-  s.version          = '0.0.4'
+  s.version          = '1.3.8'
   s.summary          = 'A new Flutter project.'
   s.description      = <<-DESC
 A new Flutter project.
@@ -15,7 +15,7 @@ A new Flutter project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'TPLMaps', '3.0.4'
+  s.dependency 'TPLMaps', '4.0.4'
   s.platform = :ios, '8.0'
 
   # Flutter.framework does not contain a i386 slice.

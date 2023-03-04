@@ -85,6 +85,8 @@ class _TplMapsViewState extends State<TplMapsView>{
         widget.tPlMapsViewMarkerCallBack!(call.arguments.toString());
         break;
       case "onMarkerClick":
+        print("Flutter iOS Tesint");
+        print(call.arguments.toString());
         widget.tPlMapsViewMarkerCallBack!(call.arguments.toString());
         break;
     }
@@ -187,6 +189,11 @@ class TplMapsViewController {
   Future<void> setZoomLevel(double zoom) async {
     print("camera animated called");
     return _channel.invokeMethod('setZoomLevel', {'zoom':zoom});
+  }
+
+  Future<void> setZoomFixedCenter(double zoom) async {
+    print("setZoomFixedCenter Called");
+    return _channel.invokeMethod('setZoomFixedCenter', {'zoom':zoom});
   }
 
   Future<void> addMarker(double latitude,double longitude) async {
