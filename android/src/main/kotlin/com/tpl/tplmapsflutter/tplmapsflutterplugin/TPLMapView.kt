@@ -69,7 +69,6 @@ class TPLMapView internal constructor(
         longClickMarkerEnable = args?.get("longClickMarkerEnable") as Boolean
 
 
-
         map.setTrafficEnabled(isTrafficEnabled);
         map.setBuildingsEnabled(isShowBuildings);
         map.setPOIsEnabled(enablePOIs)
@@ -78,6 +77,7 @@ class TPLMapView internal constructor(
         } else {
             map.mapMode = MapMode.NIGHT
         }
+
         map.loadMapAsync(this);
     }
 
@@ -366,8 +366,9 @@ class TPLMapView internal constructor(
     override fun onMapReady(mapController: MapController?) {
         mMapController = mapController!!
 
-        map.mapController.setMyLocationEnabled(
-            true, MapController.MyLocationArg.ZOOM_LOCATION_ON_FIRST_FIX);
+
+
+      //  map.mapController.setMyLocationEnabled(true, MapController.MyLocationArg.ZOOM_LOCATION_ON_FIRST_FIX);
 
         mUiSettings = mapController.uiSettings
         var isZoomEnabled: Boolean = args?.get("isZoomEnabled") as Boolean

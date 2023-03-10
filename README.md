@@ -22,5 +22,11 @@ Added marker and zooming functionality
 ## V - 1.3.0
 - Flutter 3.0+ support
 
-## V - 1.6.7
+## V - 1.3.7
+- Minor Bug Fixes
+
+## V - 1.3.9
+- Minor Bug Fixes
+- 
+## V - 1.4.0
 - Minor Bug Fixes

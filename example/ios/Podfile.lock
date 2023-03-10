@@ -1,7 +1,7 @@
 PODS:
   - Flutter (1.0.0)
   - TPLMaps (3.0.4)
-  - tplmapsflutterplugin (0.0.4):
+  - tplmapsflutterplugin (1.3.8):
     - Flutter
     - TPLMaps (= 3.0.4)
 
@@ -22,7 +22,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   TPLMaps: 878d66ed770649509fd4b93a7e19829f142e1261
-  tplmapsflutterplugin: 263281f3054df5a9d6e10e067a528dbfe2016c62
+  tplmapsflutterplugin: a86946b6e3518634268fbe479dc4ccf3d531383e
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 
