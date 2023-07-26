@@ -26,7 +26,7 @@
         android:largeHeap="true">
 
         <meta-data android:name="com.tplmaps.android.sdk.API_KEY"
-            android:value="$2a$10$S0hDhKNNZgcC9JR6nPXDBDrUAqj8f5gDLP2a0lLGqCTfNKq5GpvY6" />
+            android:value="" />
 
         <!--TPL MAPS CONFIGURATIONS-->
         <uses-library
