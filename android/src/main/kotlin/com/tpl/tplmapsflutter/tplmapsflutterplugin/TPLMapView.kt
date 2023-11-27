@@ -78,6 +78,7 @@ class TPLMapView internal constructor(
             map.mapMode = MapMode.NIGHT
         }
 
+        map.onCreate(null);
         map.loadMapAsync(this);
     }
 
@@ -367,8 +368,7 @@ class TPLMapView internal constructor(
         mMapController = mapController!!
 
 
-
-      //  map.mapController.setMyLocationEnabled(true, MapController.MyLocationArg.ZOOM_LOCATION_ON_FIRST_FIX);
+      //  map.mapController.setMyLocationEnabled(false, MapController.MyLocationArg.NONE);
 
         mUiSettings = mapController.uiSettings
         var isZoomEnabled: Boolean = args?.get("isZoomEnabled") as Boolean
@@ -382,6 +382,7 @@ class TPLMapView internal constructor(
         mUiSettings.isAllMapGesturesEnabled = allGesturesEnabled
         mMapController.setMyLocationEnabled(setMyLocationEnabled)
         mUiSettings.showMyLocationButton(myLocationButtonEnabled)
+
         //  mMapController.setOnCameraChangeListener(this)
 
 

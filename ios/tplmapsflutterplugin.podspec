@@ -4,8 +4,8 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'tplmapsflutterplugin'
-  s.version          = '1.3.8'
-  s.summary          = 'A new Flutter project.'
+  s.version          = '1.5.1'
+  s.summary          = 'TPL Maps Flutter'
   s.description      = <<-DESC
 A new Flutter project.
                        DESC
@@ -15,8 +15,9 @@ A new Flutter project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'TPLMaps', '3.0.4'
-  s.platform = :ios, '8.0'
+  #s.dependency 'TPLMaps', '3.0.4'
+  s.dependency 'TPLMaps'
+  s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

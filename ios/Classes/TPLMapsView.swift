@@ -43,20 +43,23 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
                     print("setMyLocationEnabled: \(setMyLocationEnabled)")
                     self.map.zoomEnabled = isZoomEnabled
                     self.map.showsBuildings = isShowBuildings
-                    self.map.zoomControlsEnabled = showZoomControls
+                    self.map.zoomControlsEnabled = true
                     self.map.showsCompass = showsCompass
                     self.map.allGesturesEnabled = allGesturesEnabled
                     self.map.trafficEnabled = isTrafficEnabled
                     self.map.showsPointsOfInterest = enablePOIs
+                   
+                
                     
                     self.map.showsUserLocation = setMyLocationEnabled;
                     self.map.myLocationButtonEnabled = myLocationButtonEnabled
-                    if(mapMode == 1){
-                        self.map.mapMode = MapViewTheme.DAY
-                    }
-                    else{
-                        self.map.mapMode = MapViewTheme.NIGHT
-                    }
+                    self.map.userLocationIconEnabled = false
+//                    if(mapMode == 1){
+//                        self.map.mapMode = MapViewTheme.DAY
+//                    }
+//                    else{
+//                        self.map.mapMode = MapViewTheme.NIGHT
+//                    }
                     
             
                 
@@ -143,6 +146,9 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
                             mapViewTheme = MapViewTheme.NIGHT
                         }
                         self.setMapMode(self.map, theme: mapViewTheme)
+                     case "removeAllMarkers":
+                         self.map.removeAllMarkers()
+                         break
                     default:
                         result(FlutterMethodNotImplemented)
                         return
@@ -186,7 +192,7 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
         mapView.showsUserLocation = isEnable
     }
     func setMapMode(_ mapView: TPLMapView, theme: MapViewTheme){
-        mapView.mapMode = theme
+      //  mapView.mapMode = theme
     }
     func addMarker(_ mapView: TPLMapView, latitude: Double, longitude: Double){
         let coord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -221,21 +227,53 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
         }
 
     func mapViewDidCompleteLoading(_ mapView: TPLMapView) {
-        
+//        let centrePoint = mapView.center
+//        let CentreGeoPoint = mapView.coordinateForPoint(point: centrePoint) as CLLocationCoordinate2D
+//
+//        let lat = String(format: "%f", mapView.cameraPosition.location.latitude);
+//        let lng = String(format: "%f", mapView.cameraPosition.location.longitude);
+//        let latlng = lat+","+lng;
+//
+//        let poiMap = ["LatLng": latlng];
+//
+//        DispatchQueue.main.async {
+//            self.mapChannel.invokeMethod("onMarkerClick", arguments: poiMap)
+//                }
+//
+//        print("mapViewDidCompleteLoading---"+latlng)
         
     }
     
     func mapView(_ mapView: TPLMapView, cameraPositionDidEndChange cameraPosition: CameraPosition){
-        print("CAMERA CHANGE---")
-//        print(cameraPosition)
-//        DispatchQueue.main.async {
-//            self.mapChannel.invokeMethod("onMarkerClick", arguments: "nil")
-//                }
+       
+        
+//        let lat = String(format: "%f", cameraPosition.location.latitude);
+//        let lng = String(format: "%f", cameraPosition.location.longitude);
+//        let latlng = lat+","+lng;
+//
+//        print("CameraPositionDidEnd " + latlng)
+       
     }
     
     func mapView(_ mapView: TPLMapView, regionWillChangeAnimated animated: Bool){
         print("Region CHANGE---")
       
+//        let lat = String(format: "%f", mapView.cameraPosition.location.latitude);
+//        let lng = String(format: "%f", mapView.cameraPosition.location.longitude);
+//        let latlng = lat+","+lng;
+//
+//        let poiMap = ["LatLng": latlng];
+//
+//        DispatchQueue.main.async {
+//            self.mapChannel.invokeMethod("onMarkerClick", arguments: poiMap)
+//                }
+//
+//        print("regionWillChangeAnimated " + latlng)
+
+    }
+    
+    func mapView(_ mapView: TPLMapView, regionDidChangeAnimated animated: Bool){
+        
         let lat = String(format: "%f", mapView.cameraPosition.location.latitude);
         let lng = String(format: "%f", mapView.cameraPosition.location.longitude);
         let latlng = lat+","+lng;
@@ -245,15 +283,26 @@ class TPLMapsView: NSObject, FlutterPlatformView, TPLMaps.TPLMapViewDelegate {
         DispatchQueue.main.async {
             self.mapChannel.invokeMethod("onMarkerClick", arguments: poiMap)
                 }
-
+    
+        
+        print("regionDidChangeAnimated " + latlng)
+       
     }
     
     func mapView(_ mapView: TPLMapView, cameraPositionDidChange cameraPosition: CameraPosition){
-        print("CAMERA CHANGING---")
+//        let lat = String(format: "%f", mapView.cameraPosition.location.latitude);
+//        let lng = String(format: "%f", mapView.cameraPosition.location.longitude);
+//        let latlng = lat+","+lng;
+//
+//        let poiMap = ["LatLng": latlng];
+//
+//        DispatchQueue.main.async {
+//            self.mapChannel.invokeMethod("onMarkerClick", arguments: poiMap)
+//                }
     }
     
     func mapView(_ mapView: TPLMapView, didSelect marker: Marker){
-        print("MARKER CLICK---")
+     
     }
 
     

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.tpl.tplmapsflutter.tplmapsflutterplugin">
+    package="com.tpl.tplmapsflutter.tplmapsflutterplugin">
 
 
 
@@ -20,18 +20,11 @@
         android:glEsVersion="0x00020000"
         android:required="true" />
     <application
-        android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:hardwareAccelerated="true"
         android:networkSecurityConfig="@xml/network_security"
         android:largeHeap="true">
 
-
-
-        <!--TPL MAPS CONFIGURATIONS-->
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
 
 
 

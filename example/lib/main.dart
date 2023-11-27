@@ -1,18 +1,15 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:tplmapsflutterplugin/TplMapsView.dart';
-import 'package:tplmapsflutterplugin/tplmapsflutterplugin.dart';
-import 'package:tplmapsflutterplugin_example/second.dart';
-import 'package:drawable/drawable.dart';
+
+
 
 
 
@@ -21,6 +18,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+
+
   const MyApp({Key? key}) : super(key: key);
 
 
@@ -46,7 +45,32 @@ class MyHomePage extends StatefulWidget {
 late TplMapsViewController _controller;
 double zoomLevel = 8;
 
+
+
+
 class _MyAppState extends State<MyHomePage> {
+
+  String textValue = "";
+  Timer timeHandle = Timer(Duration(seconds: 3), () {});
+
+  void textChanged(String val) {
+    textValue = val;
+    if (timeHandle != null) {
+      timeHandle.cancel();
+    }
+    timeHandle = Timer(Duration(seconds: 3), () {
+      if(textValue != ""){
+        print("Calling API Here: $textValue");
+      }
+
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timeHandle.cancel();
+  }
 
   // Initial Selected Value
   String dropdownvalue = 'Item 1';
@@ -65,22 +89,6 @@ class _MyAppState extends State<MyHomePage> {
     // Pass parameters to the platform side.
     const Map<String, dynamic> creationParams = <String, dynamic>{};
 
-
-    // return TplMapsView(
-    //   isShowBuildings: true,
-    //   isZoomEnabled: true,
-    //   showZoomControls: true,
-    //   isTrafficEnabled: true,
-    //   mapMode: MapMode.DEFAULT,
-    //   enablePOIs: true,
-    //   setMyLocationEnabled: false,
-    //   myLocationButtonEnabled: false,
-    //   showsCompass: true,
-    //   allGesturesEnabled: true,
-    //   tplMapsViewCreatedCallback: _callback,
-    //   tPlMapsViewMarkerCallBack: _markerCallback,
-    // );
-
     return Scaffold(
       appBar: AppBar(
         title: Text("App Bar 1"),
@@ -95,13 +103,13 @@ class _MyAppState extends State<MyHomePage> {
               isTrafficEnabled: true,
               longClickMarkerEnable: false,
               mapMode: MapMode.NIGHT,
-              enablePOIs: true,
+              enablePOIs: false,
               setMyLocationEnabled: true,
-              myLocationButtonEnabled: true,
+              myLocationButtonEnabled: false,
               showsCompass: true,
               allGesturesEnabled: true,
               tplMapsViewCreatedCallback: _callback,
-              tPlMapsViewMarkerCallBack: _markerCallback,
+
             ),
 
           ),
@@ -132,12 +140,19 @@ class _MyAppState extends State<MyHomePage> {
                       setState(() {
                         dropdownvalue = newValue!;
                         _controller.setZoomLevel(11.0);
+                        
                       });
                     },
                   ),
                 ],
 
               )
+          ),
+          TextField(
+              onChanged: textChanged,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Please enter a search term')
           ),
           GestureDetector(
             onTap: (){
@@ -171,7 +186,7 @@ class _MyAppState extends State<MyHomePage> {
 
   }
 
-  void _markerCallback(String callback){
+  void _markerCallback(String callback) {
 
     log(callback);
     //Navigator.push(context, PageTransition(type: PageTransitionType.leftToRight, child: SecondRoute()));
@@ -185,9 +200,9 @@ class _MyAppState extends State<MyHomePage> {
     // controller.setZoomEnabled(false);
      controller.showZoomControls(true);
      controller.setTrafficEnabled(false);
-     controller.enablePOIs(true);
+     controller.enablePOIs(false);
      controller.setMyLocationEnabled(true);
-     controller.myLocationButtonEnabled(true);
+     controller.myLocationButtonEnabled(false);
      controller.showsCompass(false);
 
      controller.setCameraPositionAnimated(33.698047971892045, 73.06930062598059, 14.0);
@@ -196,8 +211,14 @@ class _MyAppState extends State<MyHomePage> {
 
 
     controller.addMarkerCustomMarker(33.698047971892045, 73.06930062598059, 50 , 50);
+    // controller.addMarkerCustomMarker(33.698047972345, 73.0693006876459, 50 , 50);
+    // controller.addMarkerCustomMarker(33.6980479712357878, 73.06930098543452, 50 , 50);
+    // controller.addMarkerCustomMarker(33.698047971652341, 73.069300687988, 50 , 50);
+    // controller.addMarkerCustomMarker(33.69804797667524235, 73.06930062855673, 50 , 50);
+    // controller.addMarkerCustomMarker(0, 0, 50 , 50);
+    // controller.addMarkerCustomMarker(24.826295, 67.1236449, 50 , 50);
 
-    controller.addMarker(33.705349, 73.069788);
+   // controller.addMarker(33.705349, 73.069788);
 
     // controller.allGesturesEnabled(false);
      controller.setMapMode(MapMode.DEFAULT);
@@ -210,6 +231,9 @@ class _MyAppState extends State<MyHomePage> {
     //mapMode: MapMode.DEFAULT,
 
      _controller = controller;
+
+     _controller.removeAllMarker();
+
   }
 
   void addPolyline(){

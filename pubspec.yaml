@@ -1,6 +1,6 @@
 name: tplmapsflutterplugin
 description: TPL Maps Flutter Plugin.
-version: 1.4.0
+version: 1.5.2
 homepage: https://github.com/daniyalahmedkhan/TPLMaps_Flutter_Plugin
 
 environment:
@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  drawable: ^0.1.0
 
 dev_dependencies:
   flutter_test:

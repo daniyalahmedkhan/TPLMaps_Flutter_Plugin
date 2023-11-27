@@ -43,13 +43,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
-  drawable:
-    dependency: transitive
-    description:
-      name: drawable
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -155,7 +148,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.4.0"
+    version: "1.5.2"
   vector_math:
     dependency: transitive
     description:
@@ -165,4 +158,4 @@ packages:
     version: "2.1.2"
 sdks:
   dart: ">=2.17.0-0 <3.0.0"
-  flutter: ">=1.26.0-17.5.pre"
+  flutter: ">=1.20.0"

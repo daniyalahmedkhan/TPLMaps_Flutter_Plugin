@@ -87,10 +87,12 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.tpl.maps.sdk:maps:1.6.7.1'
+
+    implementation 'com.tpl.maps.sdk:maps:1.1.0.13-Dominos'
+   // implementation project(':maps')
 
     // Places
-    implementation 'com.tpl.maps.sdk:places:1.6.7'
+    implementation 'com.tpl.maps.sdk:places:1.6.9'
 
     // Routing
     implementation 'com.tpl.maps.sdk:routing:1.6.3'
