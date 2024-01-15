@@ -90,13 +90,12 @@ dependencies {
 
     implementation 'com.tpl.maps.sdk:maps:1.1.0.13-Dominos'
    // implementation project(':maps')
-
     // Places
-    implementation 'com.tpl.maps.sdk:places:1.6.9'
+    implementation 'com.tpl.maps.sdk:places:1.7.1'
+//    implementation project(':places')
 
     // Routing
-    implementation 'com.tpl.maps.sdk:routing:1.6.3'
-
+   // implementation 'com.tpl.maps.sdk:routing:1.6.3'
     implementation 'com.google.android.material:material:1.2.0-alpha01'
    // implementation files('/Users/daniyalahmed/Users/daniyalahmed/Developer/flutter/bin/cache/artifacts/engine/android-x64/flutter.jar')
 }

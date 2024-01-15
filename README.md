@@ -1,4 +1,4 @@
-# Flutter TPL Maps (v-1.5.2)
+# Flutter TPL Maps (v-1.5.5)
 
 
 **Flutter TPL Maps** Android, iOS plugin for Flutter Apps. It will help you to add maps in your application. The API automatically handles access to our TPL Maps servers, data downloading, map display, and response to map gestures. You can do add markers, shapes, POIs show/hide point of interests, custom map styles and much more.

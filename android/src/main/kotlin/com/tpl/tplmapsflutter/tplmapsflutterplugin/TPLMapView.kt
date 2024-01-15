@@ -34,12 +34,12 @@ class TPLMapView internal constructor(
 ) : PlatformView,
 
     MethodChannel.MethodCallHandler, MapView.OnMapReadyCallback, FlutterActivity(), FlutterPlugin {
-    private var mapViw: View
+    private lateinit var mapViw: View
     private lateinit var map: MapView
     private lateinit var myLocBtn: ExtendedFloatingActionButton
     private lateinit var mMapController: MapController
     private lateinit var mUiSettings: UISettings
-    private var channel: MethodChannel
+    private lateinit var channel: MethodChannel
     private var args: HashMap<String?, Any?>? = null
     private var longClickMarkerEnable: Boolean = false;
 
@@ -54,32 +54,35 @@ class TPLMapView internal constructor(
     }
 
     init {
-        channel = MethodChannel(messenger, "plugins/map")
-        channel.setMethodCallHandler(this)
-        mapViw = LayoutInflater.from(context).inflate(R.layout.activity_main, null)
-        // activity = this
+        try {
+            channel = MethodChannel(messenger, "plugins/map")
+            channel.setMethodCallHandler(this)
+            mapViw = LayoutInflater.from(context).inflate(R.layout.activity_main, null)
+            // activity = this
 
-        map = mapViw.findViewById(R.id.tplmap)
-        args = params as HashMap<String?, Any?>?
-        //var keys: MutableSet<String?> = args!!.keys
-        var isTrafficEnabled: Boolean = args?.get("isTrafficEnabled") as Boolean
-        var isShowBuildings: Boolean = args?.get("isShowBuildings") as Boolean
-        var mapMode = args?.get("mapMode")
-        var enablePOIs = args?.get("enablePOIs") as Boolean
-        longClickMarkerEnable = args?.get("longClickMarkerEnable") as Boolean
+            map = mapViw.findViewById(R.id.tplmap)
+            args = params as HashMap<String?, Any?>?
+            //var keys: MutableSet<String?> = args!!.keys
+            var isTrafficEnabled: Boolean = args?.get("isTrafficEnabled") as Boolean
+            var isShowBuildings: Boolean = args?.get("isShowBuildings") as Boolean
+            var mapMode = args?.get("mapMode")
+            var enablePOIs = args?.get("enablePOIs") as Boolean
+            longClickMarkerEnable = args?.get("longClickMarkerEnable") as Boolean
 
 
-        map.setTrafficEnabled(isTrafficEnabled);
-        map.setBuildingsEnabled(isShowBuildings);
-        map.setPOIsEnabled(enablePOIs)
-        if (mapMode == 1) {
-            map.mapMode = MapMode.DEFAULT
-        } else {
-            map.mapMode = MapMode.NIGHT
-        }
+            map.setTrafficEnabled(isTrafficEnabled);
+            map.setBuildingsEnabled(isShowBuildings);
+            map.setPOIsEnabled(enablePOIs)
+            if (mapMode == 1) {
+                map.mapMode = MapMode.DEFAULT
+            } else {
+                map.mapMode = MapMode.NIGHT
+            }
 
-        map.onCreate(null);
-        map.loadMapAsync(this);
+            map.onCreate(null);
+            map.loadMapAsync(this);
+        }catch (e: Exception){}
+
     }
 
 
@@ -213,6 +216,12 @@ class TPLMapView internal constructor(
             "removeAllCircles" -> {
                 removeAllCircles()
             }
+            "cancelMapRequest" -> {
+                onDestroy()
+            }
+            "pauseMapRequest" -> {
+                onPause()
+            }
             else -> result.notImplemented()
         }
     }
@@ -323,7 +332,10 @@ class TPLMapView internal constructor(
 
 
     private fun mapReady() {
-        channel.invokeMethod("onMapReady", true)
+        try {
+            channel.invokeMethod("onMapReady", true)
+        }catch (e : Exception){}
+
     }
 
     private fun addPolyline(startLat: Double, startLng: Double, endLat: Double, endLng: Double) {
@@ -365,76 +377,78 @@ class TPLMapView internal constructor(
 
     @UiThread
     override fun onMapReady(mapController: MapController?) {
-        mMapController = mapController!!
+
+        try {
+            mMapController = mapController!!
 
 
-      //  map.mapController.setMyLocationEnabled(false, MapController.MyLocationArg.NONE);
+            //  map.mapController.setMyLocationEnabled(false, MapController.MyLocationArg.NONE);
 
-        mUiSettings = mapController.uiSettings
-        var isZoomEnabled: Boolean = args?.get("isZoomEnabled") as Boolean
-        var showsCompass = args?.get("showsCompass") as Boolean
-        var showZoomControls: Boolean = args?.get("showZoomControls") as Boolean
-        var myLocationButtonEnabled = args?.get("myLocationButtonEnabled") as Boolean
-        var allGesturesEnabled = args?.get("allGesturesEnabled") as Boolean
-        var setMyLocationEnabled = args?.get("setMyLocationEnabled") as Boolean
-        mUiSettings.showCompass(showsCompass)
-        mUiSettings.showZoomControls(showZoomControls)
-        mUiSettings.isAllMapGesturesEnabled = allGesturesEnabled
-        mMapController.setMyLocationEnabled(setMyLocationEnabled)
-        mUiSettings.showMyLocationButton(myLocationButtonEnabled)
+            mUiSettings = mapController.uiSettings
+            var isZoomEnabled: Boolean = args?.get("isZoomEnabled") as Boolean
+            var showsCompass = args?.get("showsCompass") as Boolean
+            var showZoomControls: Boolean = args?.get("showZoomControls") as Boolean
+            var myLocationButtonEnabled = args?.get("myLocationButtonEnabled") as Boolean
+            var allGesturesEnabled = args?.get("allGesturesEnabled") as Boolean
+            var setMyLocationEnabled = args?.get("setMyLocationEnabled") as Boolean
+            mUiSettings.showCompass(showsCompass)
+            mUiSettings.showZoomControls(showZoomControls)
+            mUiSettings.isAllMapGesturesEnabled = allGesturesEnabled
+            mMapController.setMyLocationEnabled(setMyLocationEnabled)
+            mUiSettings.showMyLocationButton(myLocationButtonEnabled)
 
-        //  mMapController.setOnCameraChangeListener(this)
+            //  mMapController.setOnCameraChangeListener(this)
 
 
-        mMapController.setOnPoiClickListener {
+            mMapController.setOnPoiClickListener {
 
-            val poiMap = HashMap<String, String>()
-            poiMap["LatLng"] = "${it.lngLat.latitude}" + ",${it.lngLat.longitude}"
-            poiMap["name"] = it.name
-            poiMap["id"] = it.id
-
-            channel.invokeMethod("onPoiClickListener", poiMap)
-        }
-
-        mMapController.setOnMapLongClickListener { x, y ->
-
-            if (longClickMarkerEnable) {
-                val tapPoint = mMapController.screenPositionToLngLat(PointF(x, y))
                 val poiMap = HashMap<String, String>()
-                poiMap["On Map Long Click Listner"] = "::"
-                poiMap["LatLng"] = "${tapPoint.latitude}" + ",${tapPoint.longitude}"
-                channel.invokeMethod("onLongClickListener", poiMap)
-                addMarker(map, tapPoint.latitude, tapPoint.longitude)
+                poiMap["LatLng"] = "${it.lngLat.latitude}" + ",${it.lngLat.longitude}"
+                poiMap["name"] = it.name
+                poiMap["id"] = it.id
+
+                channel.invokeMethod("onPoiClickListener", poiMap)
             }
 
-        }
+            mMapController.setOnMapLongClickListener { x, y ->
 
-        mMapController.setOnMarkerClickListener {
-            val poiMap = HashMap<String, String>()
-            poiMap["On Marker Click Listener"] = "::"
-            poiMap["LatLng"] = "${it.position.latitude}" + ",${it.position.longitude}"
-            poiMap["name"] = it.title
-            poiMap["id"] = it.id.toString()
-            poiMap["desc"] = it.description ?: ""
-            channel.invokeMethod("onMarkerClick", poiMap)
-        }
+                if (longClickMarkerEnable) {
+                    val tapPoint = mMapController.screenPositionToLngLat(PointF(x, y))
+                    val poiMap = HashMap<String, String>()
+                    poiMap["On Map Long Click Listner"] = "::"
+                    poiMap["LatLng"] = "${tapPoint.latitude}" + ",${tapPoint.longitude}"
+                    channel.invokeMethod("onLongClickListener", poiMap)
+                    addMarker(map, tapPoint.latitude, tapPoint.longitude)
+                }
 
+            }
 
-        // Change Camera Listener V-1.3.3
-        mMapController.setOnCameraChangeEndListener {
-            runOnUiThread {
+            mMapController.setOnMarkerClickListener {
                 val poiMap = HashMap<String, String>()
-                poiMap["On Camera Change Listener"] = "::"
+                poiMap["On Marker Click Listener"] = "::"
                 poiMap["LatLng"] = "${it.position.latitude}" + ",${it.position.longitude}"
+                poiMap["name"] = it.title
+                poiMap["id"] = it.id.toString()
+                poiMap["desc"] = it.description ?: ""
                 channel.invokeMethod("onMarkerClick", poiMap)
-                Log.d("LatLngCAMERA" , "${it.position.latitude}" + ",${it.position.longitude}")
             }
-        }
 
-        mapReady()
-        //       val islamabad = LngLat(73.093104, 33.730494)
-//        mapController.addMarker(com.tplmaps3d.MarkerOptions().position(islamabad).title("Islamabad"))
-//        map.getMapController().animateCamera(CameraPosition.fromLngLatZoom(mapController, islamabad, 12.0F), 0)
+
+            // Change Camera Listener V-1.3.3
+            mMapController.setOnCameraChangeEndListener {
+                runOnUiThread {
+                    val poiMap = HashMap<String, String>()
+                    poiMap["On Camera Change Listener"] = "::"
+                    poiMap["LatLng"] = "${it.position.latitude}" + ",${it.position.longitude}"
+                    channel.invokeMethod("onMarkerClick", poiMap)
+                    Log.d("LatLngCAMERA" , "${it.position.latitude}" + ",${it.position.longitude}")
+                }
+            }
+
+            mapReady()
+        }catch (e : Exception){}
+
+
     }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -445,6 +459,13 @@ class TPLMapView internal constructor(
         TODO("Not yet implemented")
     }
 
+    override fun onPause() {
+        map.onPause()
+    }
+
+    override fun onDestroy() {
+        map.onDestroy()
+    }
 
 }
 

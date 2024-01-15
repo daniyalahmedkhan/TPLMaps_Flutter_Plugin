@@ -32,7 +32,6 @@ class TPLPlacesSearch internal constructor(context: Context?, id: Int, messenger
         searchManager.onCreate();
 
         val position = LngLat(lng, lat)
-
         // Request for query after initializing SearchManager
         // put your query string with location to get your nearer results first
         searchManager.request(
@@ -61,7 +60,6 @@ class TPLPlacesSearch internal constructor(context: Context?, id: Int, messenger
 
     override fun onSearchResult(results: ArrayList<Place>?) {
         val jsonString = Gson().toJson(results)
-
         channel.invokeMethod("searchManagerResult" , jsonString.toString())
     }
 
@@ -113,6 +111,7 @@ class TPLPlacesSearch internal constructor(context: Context?, id: Int, messenger
                 val query : String = call.argument<String>("query") ?: ""
                 val lat : Double = call.argument<Double>("lat") ?: 0.0
                 val lng : Double = call.argument<Double>("lng") ?: 0.0
+
                 searchQuery(query , lat , lng)
             }
             "reverseSearchManager" -> {

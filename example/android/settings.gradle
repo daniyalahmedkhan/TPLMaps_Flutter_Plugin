@@ -11,5 +11,5 @@ assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
 apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
 
 //
-//include ':maps'
-//project(':maps').projectDir = new File('/Volumes/Untitled 1/StudioProjects/TplMaps-Tayyab/tangram-platform-sdk/maps')
+//include ':places'
+//project(':places').projectDir = new File('/Volumes/Untitled 1/StudioProjects/TplMaps-Tayyab/tangram-platform-sdk/places')

@@ -275,6 +275,14 @@ class TplMapsViewController {
     return _channel.invokeMethod('setUpPolyLine' , {''});
   }
 
+  Future<void> cancelMapRequest() async {
+    return _channel.invokeMethod('cancelMapRequest');
+  }
+
+  Future<void> pauseMapRequest() async {
+    return _channel.invokeMethod('pauseMapRequest');
+  }
+
 }
 
 /*
@@ -330,7 +338,7 @@ class TPlSearchViewController{
                 //   tplMapsViewCreatedCallback: _callback,
                 //   tPlMapsViewMarkerCallBack: _markerCallback,
                 // ),dHandler);
-    return _channelSearch.invokeMethod('reverseSearchManager' , {'lat': lat , 'lng' : lng});
+    return _channelSearch.invokeMethod('reverseSearchManager' , {'lat': this.lat , 'lng' : this.lng});
     // searchViewController.call("");
   }
 
