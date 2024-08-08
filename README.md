@@ -1,4 +1,4 @@
-# Flutter TPL Maps (v-1.5.5)
+# Flutter TPL Maps (v-1.6.1)
 
 
 **Flutter TPL Maps** Android, iOS plugin for Flutter Apps. It will help you to add maps in your application. The API automatically handles access to our TPL Maps servers, data downloading, map display, and response to map gestures. You can do add markers, shapes, POIs show/hide point of interests, custom map styles and much more.
@@ -8,7 +8,7 @@
 ### Maintainers
 
 **TPL Maps** 
-- Abdul Basit - Head of Analytics & Data Services – Information Technology (IT) - Abdul.Basit@tplmaps.com
+- Bilal Sipra - Head of Information Technology (IT) - bilal.sipra@tplmaps.com
 - Daniyal Ahmed Khan - Manager & Team Lead (Android Development) - daniyal.khan@tplmaps.com
 
 ### Platform Compatibility  
@@ -29,31 +29,35 @@ Please follow the below steps:
 
 4- **Add tplservices.config file in iOS project (Download from api.tplmaps.com follow iOS guide.)**  
 
-5- **Access in dart classes  import 'package:tplmapsflutterplugin/tplmapsflutterplugin.dart';   **  
+5- **Access in dart classes  import 'package:tplmapsflutterplugin/tplmapsflutterplugin.dart';**  
 
 ### Usage
 
 ```tsx
 return TplMapsView(
-        isShowBuildings: true,
-        isZoomEnabled: true,,
-        showZoomControls: true,,
-        isTrafficEnabled: true,,
-        mapMode: MapMode.NIGHT,
-         enablePOIs: true,,
-         setMyLocationEnabled: false,
-         myLocationButtonEnabled: false,
-         showsCompass: true,,
-         allGesturesEnabled: true,,
- tplMapsViewCreatedCallback: _callback,
- );
- void _callback (TplMapsViewController controller)
- {
- }
+              isShowBuildings: true,
+              isZoomEnabled: true,
+              showZoomControls: true,
+              isTrafficEnabled: true,
+              longClickMarkerEnable: true,
+              mapMode: MapMode.NIGHT,
+              enablePOIs: true,
+              setMyLocationEnabled: false,
+              myLocationButtonEnabled: true,
+              showsCompass: true,
+              allGesturesEnabled: true,
+              tplMapsViewCreatedCallback: _onTPLMapsViewCreatedCallback,
+              tPlMapsViewMarkerCallBack: _markerCallback,
+              tPlMapsViewPolyLineCallBack: _polyLineCallback,
+              tPlMapsViewPOIClickCallBack: _POIClickCallback,
+              tPlMapsViewPolygonCallBack: _polygonClickCallback,
+              tPlMapsViewLongClickCallBack: _mapViewLongClickCallback,
+              tPlMapsViewCircleClickCallBack: _mapViewCircleClickCallback,
+              tPlMapsViewCameraChangedCallBack: _mapViewCameraChangedCallback,
+            ),
+
  
- 
- 
- void _callback(TplMapsViewController controller) {
+ void _onTPLMapsViewCreatedCallback(TplMapsViewController controller) {
         _controller = controller;
         controller.showBuildings(false);
         controller.showZoomControls(false);
@@ -74,6 +78,103 @@ return TplMapsView(
         bool isPOIsEnabled = controller.isPOIsEnabled;
         print("isPOIsEnabled: $isPOIsEnabled");
 }
+
+ void _markerCallback(String callback) {
+    print(callback);
+    Utils.showMessageToast("Marker CLICK Callback");
+    // Find the index of "LatLng:"
+    int latLngIndex = callback.indexOf("LatLng:");
+
+    if (latLngIndex != -1) {
+      // Extract substring after "LatLng:"
+      String latLngSubstring =
+          callback.substring(latLngIndex + "LatLng:".length).trim();
+
+      // Split the substring to get the values
+      List<String> values = latLngSubstring.split(',');
+
+      // Assuming the first value is latitude and the second value is longitude
+      if (values.length >= 2) {
+        String latitude = values[0].trim();
+        String longitude = values[1].trim();
+
+        print("Latitude: $latitude, Longitude: $longitude");
+
+        postData(latitude + ";" + longitude.split("}")[0]);
+      }
+    }
+  }
+
+
+
+ void _polyLineCallback(String callback) {
+    print(callback);
+    Utils.showMessageToast("PolyLine CLICK Callback");
+  }
+
+  void _polygonClickCallback(String callback) {
+    print(callback);
+    Utils.showMessageToast("Polygon CLICK Callback");
+  }
+
+  void _POIClickCallback(String callback) {
+    print(callback);
+    Utils.showMessageToast("POI CLICK Callback");
+  }
+
+  void _mapViewCircleClickCallback(String callback) {
+    print(callback);
+    Utils.showMessageToast("Circle CLICK Callback");
+  }
+
+  void _mapViewLongClickCallback(String callback) {
+    print(callback);
+
+    int latLngIndex = callback.indexOf("LatLng:");
+
+    if (latLngIndex != -1) {
+      // Extract substring after "LatLng:"
+      String latLngSubstring =
+      callback.substring(latLngIndex + "LatLng:".length).trim();
+
+      // Split the substring to get the values
+      List<String> values = latLngSubstring.split(',');
+
+      // Assuming the first value is latitude and the second value is longitude
+      if (values.length >= 2) {
+
+        String latitude = values[0].trim();
+        String longitude = values[1].trim();
+
+        Utils.showMessageToast("Long Click");
+
+      }
+    }
+  }
+
+  void _mapViewCameraChangedCallback(String callback) {
+    print(callback);
+   //Utils.showMessageToast("Camera Changed Callback");
+    int latLngIndex = callback.indexOf("LatLng:");
+    if (latLngIndex != -1) {
+      // Extract substring after "LatLng:"
+      String latLngSubstring =
+      callback.substring(latLngIndex + "LatLng:".length).trim();
+
+      // Split the substring to get the values
+      List<String> values = latLngSubstring.split(',');
+
+      // Assuming the first value is latitude and the second value is longitude
+      if (values.length >= 2) {
+        String latitude = values[0].trim();
+        String longitude = values[1].trim();
+
+        print("Latitude: $latitude, Longitude: $longitude");
+
+        postData(latitude + ";" + longitude.split("}")[0]);
+      }
+    }
+  }
 ```
 
 
